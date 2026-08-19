@@ -4,78 +4,90 @@ import { login } from "../features/auth/authSlice";
 import { Link, useNavigate } from "react-router-dom";
 
 function Register() {
-	const dispatch = useDispatch();
-	const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
-	const [name, setName] = useState("");
-	const [email, setEmail] = useState("");
-	const [password, setPassword] = useState("");
-	const [error, setError] = useState("");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
-	const handleSubmit = (e) => {
-		e.preventDefault();
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!name || !email || !password) {
+      setError("Please fill in all fields.");
+      return;
+    }
+    dispatch(login({ name, email }));
+    navigate("/");
+  };
 
-		if (!name || !email || !password) {
-			setError("Please fill in all fields.");
-			return;
-		}
+  const inputClass =
+    "w-full px-4 py-2.5 rounded-md bg-white/5 border border-white/10 text-gray-100 placeholder-gray-500 focus:outline-none focus:border-[#f6b042]/60 focus:ring-1 focus:ring-[#f6b042]/30 transition-colors";
 
-		// Temporary mock register that logs user in
-		const user = { name, email };
-		dispatch(login(user));
-		navigate("/");
-	};
+  return (
+    <div className="min-h-screen bg-[#0b0b0d] flex items-center justify-center px-4">
+      <div className="w-full max-w-md bg-white/3 border border-white/8 rounded-2xl p-8 space-y-6">
 
-	return (
-		<div className="auth-page">
-			<div className="auth-container">
+        <div className="text-center">
+          <div className="text-[#f6b042] font-bold tracking-widest text-xl mb-4">CINÉMA</div>
+          <h1 className="text-2xl font-semibold text-white">Create your account</h1>
+          <p className="text-gray-400 text-sm mt-1">Join the movie community.</p>
+        </div>
 
-				<div className="auth-logo">CINÉMA</div>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="flex flex-col gap-1">
+            <label className="text-sm text-gray-400 font-medium">Name</label>
+            <input
+              type="text"
+              placeholder="Your name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className={inputClass}
+            />
+          </div>
 
-				<h1>Create your account</h1>
+          <div className="flex flex-col gap-1">
+            <label className="text-sm text-gray-400 font-medium">Email</label>
+            <input
+              type="email"
+              placeholder="you@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className={inputClass}
+            />
+          </div>
 
-				<p className="auth-subtitle">Join the movie community.</p>
+          <div className="flex flex-col gap-1">
+            <label className="text-sm text-gray-400 font-medium">Password</label>
+            <input
+              type="password"
+              placeholder="Create a password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className={inputClass}
+            />
+          </div>
 
-				<form onSubmit={handleSubmit}>
-					<label>Name</label>
-					<input
-						type="text"
-						placeholder="Your name"
-						value={name}
-						onChange={(e) => setName(e.target.value)}
-					/>
+          {error && <p className="text-red-400 text-sm">{error}</p>}
 
-					<label>Email</label>
-					<input
-						type="email"
-						placeholder="you@example.com"
-						value={email}
-						onChange={(e) => setEmail(e.target.value)}
-					/>
+          <button
+            type="submit"
+            className="w-full py-2.5 rounded-md bg-[#f6b042] text-black font-semibold hover:bg-[#e09a2e] transition-colors"
+          >
+            Sign Up
+          </button>
+        </form>
 
-					<label>Password</label>
-					<input
-						type="password"
-						placeholder="Create a password"
-						value={password}
-						onChange={(e) => setPassword(e.target.value)}
-					/>
-
-					{error && <p className="auth-error">{error}</p>}
-
-					<button type="submit" className="register-button">
-						Sign Up
-					</button>
-				</form>
-
-				<p className="login-text">
-					Already have an account? {" "}
-					<Link to="/login">Sign in</Link>
-				</p>
-
-			</div>
-		</div>
-		);
+        <p className="text-center text-sm text-gray-400">
+          Already have an account?{" "}
+          <Link to="/login" className="text-[#f6b042] hover:underline">
+            Sign in
+          </Link>
+        </p>
+      </div>
+    </div>
+  );
 }
 
 export default Register;
