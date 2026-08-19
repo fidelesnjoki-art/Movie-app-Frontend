@@ -60,7 +60,7 @@ function Clubs() {
                 tab === t ? "border-[#f6b042] text-white" : "border-transparent text-gray-500 hover:text-gray-300"
               }`}
             >
-              {t === "all" ? All Clubs (${clubs.length}) : My Clubs (${joinedIds.length})}
+              {t === "all" ? `All Clubs (${clubs.length})` : `My Clubs (${joinedIds.length})`}
             </button>
           ))}
         </div>
