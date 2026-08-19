@@ -4,7 +4,7 @@ const Avatar = ({ name, size = "lg" }) => {
   const sz = size === "lg" ? "w-14 h-14 text-xl" : "w-10 h-10 text-sm";
   const initials = name?.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase() ?? "?";
   return (
-    <div className={${sz} rounded-full bg-gradient-to-br from-[#f6b042]/40 to-[#ff8c42]/20 flex items-center justify-center font-bold text-[#f6b042] shrink-0}>
+    <div className={`${sz} rounded-full bg-gradient-to-br from-[#f6b042]/40 to-[#ff8c42]/20 flex items-center justify-center font-bold text-[#f6b042] shrink-0`}>
       {initials}
     </div>
   );

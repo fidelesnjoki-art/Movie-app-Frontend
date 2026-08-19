@@ -6,7 +6,7 @@ import {
 } from "../features/movies/moviesSlice";
 import { movies as localMovies } from "../data/movies";
 import MovieSearch from "../components/movies/MovieSearch";
-import MovieFilters from "../components/movies/Moviefilters";
+import MovieFilters from "../components/movies/MovieFilters";
 import MovieGrid from "../components/movies/MovieGrid";
 
 const cdramas = localMovies.filter((m) => m.isTV);

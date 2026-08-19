@@ -31,7 +31,7 @@ function CreateClub() {
       createdBy: user?.name || user?.email || "Anonymous",
     };
     dispatch(createClub(newClub));
-    navigate(/clubs);
+    navigate("/clubs");
   };
 
   const inputClass = "w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-gray-100 placeholder-gray-500 focus:outline-none focus:border-[#f6b042]/50 focus:ring-1 focus:ring-[#f6b042]/20 text-sm transition-colors";
@@ -60,7 +60,7 @@ function CreateClub() {
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="What is this club about?"
                 rows={4}
-                className={${inputClass} resize-none}
+                className={`${inputClass} resize-none`}
               />
             </div>
 

@@ -68,7 +68,7 @@ function EditProfile() {
                 onChange={(e) => setBio(e.target.value)}
                 placeholder="Tell the community about yourself…"
                 rows={3}
-                className={${inputClass} resize-none}
+                className={`${inputClass} resize-none`}
               />
               <span className="text-xs text-gray-600 text-right">{bio.length}/160</span>
             </div>
