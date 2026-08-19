@@ -14,100 +14,88 @@ function Login() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
     if (!email || !password) {
       setError("Please fill in all fields.");
       return;
     }
-
-    // Temporary mock login.
-    // We will replace this with the Flask API later.
-    const user = {
-      email,
-    };
-
-    dispatch(login(user));
-
+    dispatch(login({ email }));
     navigate("/");
   };
 
   return (
-    <div className="auth-page">
-      <div className="auth-container">
+    <div className="min-h-screen bg-[#0b0b0d] flex items-center justify-center px-4">
+      <div className="w-full max-w-md bg-white/3 border border-white/8 rounded-2xl p-8 space-y-6">
 
-        <div className="auth-logo">
-          CINÉMA
+        <div className="text-center">
+          <div className="text-[#f6b042] font-bold tracking-widest text-xl mb-4">CINÉMA</div>
+          <h1 className="text-2xl font-semibold text-white">Welcome back </h1>
+          <p className="text-gray-400 text-sm mt-1">Sign in to continue your movie journey.</p>
         </div>
 
-        <h1>Welcome back 👋</h1>
-
-        <p className="auth-subtitle">
-          Sign in to continue your movie journey.
-        </p>
-
-        <form onSubmit={handleSubmit}>
-
-          <label>Email</label>
-
-          <input
-            type="email"
-            placeholder="you@example.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-
-          <label>Password</label>
-
-          <div className="password-wrapper">
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="flex flex-col gap-1">
+            <label className="text-sm text-gray-400 font-medium">Email</label>
             <input
-              type={showPassword ? "text" : "password"}
-              placeholder="Enter your password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              type="email"
+              // placeholder="you@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full px-4 py-2.5 rounded-md bg-white/5 border border-white/10 text-gray-100 placeholder-gray-500 focus:outline-none focus:border-[#f6b042]/60 focus:ring-1 focus:ring-[#f6b042]/30 transition-colors"
             />
-
-            <button
-              type="button"
-              className="password-toggle"
-              onClick={() => setShowPassword(!showPassword)}
-            >
-              {showPassword ? "Hide" : "Show"}
-            </button>
           </div>
 
-          <div className="forgot-password">
-            <Link to="/forgot-password">
+          <div className="flex flex-col gap-1">
+            <label className="text-sm text-gray-400 font-medium">Password</label>
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                // placeholder="Enter your password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full px-4 py-2.5 pr-16 rounded-md bg-white/5 border border-white/10 text-gray-100 placeholder-gray-500 focus:outline-none focus:border-[#f6b042]/60 focus:ring-1 focus:ring-[#f6b042]/30 transition-colors"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400 hover:text-white transition-colors"
+              >
+                {showPassword ? "Hide" : "Show"}
+              </button>
+            </div>
+          </div>
+
+          <div className="text-right">
+            <Link to="/forgot-password" className="text-xs text-[#f6b042] hover:underline">
               Forgot password?
             </Link>
           </div>
 
-          {error && (
-            <p className="auth-error">
-              {error}
-            </p>
-          )}
+          {error && <p className="text-red-400 text-sm">{error}</p>}
 
-          <button type="submit" className="login-button">
+          <button
+            type="submit"
+            className="w-full py-2.5 rounded-md bg-[#f6b042] text-black font-semibold hover:bg-[#e09a2e] transition-colors"
+          >
             Log In
           </button>
-
         </form>
 
-        <div className="divider">
+        <div className="flex items-center gap-3 text-gray-600 text-sm">
+          <div className="flex-1 h-px bg-white/10" />
           <span>OR</span>
+          <div className="flex-1 h-px bg-white/10" />
         </div>
 
-        <button className="google-button">
+        <button className="w-full py-2.5 rounded-md border border-white/10 text-gray-300 hover:border-white/30 hover:text-white transition-colors text-sm">
           Continue with Google
         </button>
 
-        <p className="register-text">
+        <p className="text-center text-sm text-gray-400">
           Don't have an account?{" "}
-          <Link to="/register">
+          <Link to="/register" className="text-[#f6b042] hover:underline">
             Sign up
           </Link>
         </p>
-
       </div>
     </div>
   );
