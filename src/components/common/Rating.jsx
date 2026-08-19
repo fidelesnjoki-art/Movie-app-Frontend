@@ -1,15 +1,14 @@
 // I created this Rating component to display a five-star rating based on the value passed to it.
-const Rating = ({ value }) => {
+const Rating = ({ value, onChange }) => {
   return (
     <div className="flex">
-      // I created an array of five stars and used map to display each star.
       {[1, 2, 3, 4, 5].map(star => (
         <svg
           key={star}
-          // I used the value to change the star color depending on whether it is part of the rating.
+          onClick={() => onChange && onChange(star)}
           className={`w-4 h-4 ${
             star <= value ? 'text-amber-500' : 'text-gray-600'
-          }`}
+          } ${onChange ? 'cursor-pointer' : ''}`}
           fill="currentColor"
           viewBox="0 0 20 20"
         >
