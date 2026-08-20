@@ -14,6 +14,7 @@ function MovieDetails() {
   const isTV = id.startsWith("tv-");
   const tmdbId = isTV ? id.replace("tv-", "") : id;
   const inWatchlist = useSelector((s) => s.watchlist.items.some((m) => m.id === id));
+  const isAuthenticated = useSelector((s) => s.auth.isAuthenticated);
   const relatedPosts = useSelector((s) =>
     s.posts.items.filter((p) => p.movieId === id)
   );
@@ -109,7 +110,10 @@ function MovieDetails() {
             {/* Actions */}
             <div className="flex gap-3 mt-6">
               <button
-                onClick={() => dispatch(toggleWatchlist({ id: movie.id, title: movie.title, poster_path: movie.poster_path }))}
+                  onClick={() => {
+                    if (!isAuthenticated) return navigate("/login");
+                    dispatch(toggleWatchlist({ id: movie.id, title: movie.title, poster_path: movie.poster_path }));
+                  }}
                 className={`px-5 py-2 rounded-lg text-sm font-semibold transition-colors ${
                   inWatchlist
                     ? "bg-[#f6b042] text-black hover:bg-[#e09a2e]"
@@ -119,7 +123,10 @@ function MovieDetails() {
                 {inWatchlist ? "In Watchlist" : "Add to Watchlist"}
               </button>
               <button
-                onClick={() => navigate(`/posts/create?movie=${encodeURIComponent(movie.title)}&movieId=${movie.id}`)}
+                  onClick={() => {
+                    if (!isAuthenticated) return navigate("/login");
+                    navigate(`/posts/create?movie=${encodeURIComponent(movie.title)}&movieId=${movie.id}`);
+                  }}
                 className="px-5 py-2 rounded-lg border border-white/15 text-gray-300 text-sm hover:border-white/30 hover:text-white transition-colors"
               >
                 Write Review

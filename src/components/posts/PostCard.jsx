@@ -1,6 +1,6 @@
 // I imported the Redux hooks and Link so I can manage likes and navigate between posts and movies.
 import { useDispatch, useSelector } from "react-redux";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { toggleLike } from "../../features/posts/postsSlice";
 import Rating from "./Rating";
 
@@ -17,6 +17,8 @@ const Avatar = ({ name }) => {
 function PostCard({ post }) {
   const dispatch = useDispatch();
   const liked = useSelector((s) => s.posts.likedIds.includes(post.id));
+  const isAuthenticated = useSelector((s) => s.auth.isAuthenticated);
+  const navigate = useNavigate();
 
   return (
     <article className="flex gap-4 bg-white/3 hover:bg-white/5 border border-white/5 p-4 rounded-xl transition-colors">
@@ -33,7 +35,10 @@ function PostCard({ post }) {
         <p className="text-gray-400 text-sm mt-2 leading-relaxed line-clamp-3">{post.body}</p>
         <div className="flex items-center gap-4 mt-3">
           <button
-            onClick={() => dispatch(toggleLike(post.id))}
+            onClick={() => {
+              if (!isAuthenticated) return navigate('/login');
+              dispatch(toggleLike(post.id));
+            }}
             className={`flex items-center gap-1 text-xs transition-colors ${
               liked ? "text-[#f6b042]" : "text-gray-500 hover:text-[#f6b042]"
             }`}

@@ -13,24 +13,24 @@ import ClubDetails from "../pages/ClubDetails";
 import CreateClub from "../pages/CreateClub";
 import ProtectedRoute from "./ProtectedRoute";
 
-const Protected = ({ children }) => <ProtectedRoute>{children}</ProtectedRoute>;
-
 function AppRoutes() {
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      {/* Public browsing routes */}
+      <Route path="/" element={<Home />} />
+      <Route path="/discover" element={<Discover />} />
+      <Route path="/movies/:id" element={<MovieDetails />} />
+      <Route path="/posts/:id" element={<PostDetails />} />
+      <Route path="/clubs" element={<Clubs />} />
+      <Route path="/clubs/:id" element={<ClubDetails />} />
 
-      <Route path="/" element={<Protected><Home /></Protected>} />
-      <Route path="/discover" element={<Protected><Discover /></Protected>} />
-      <Route path="/profile" element={<Protected><Profile /></Protected>} />
-      <Route path="/profile/edit" element={<Protected><EditProfile /></Protected>} />
-      <Route path="/movies/:id" element={<Protected><MovieDetails /></Protected>} />
-      <Route path="/posts/create" element={<Protected><CreatePost /></Protected>} />
-      <Route path="/posts/:id" element={<Protected><PostDetails /></Protected>} />
-      <Route path="/clubs" element={<Protected><Clubs /></Protected>} />
-      <Route path="/clubs/create" element={<Protected><CreateClub /></Protected>} />
-      <Route path="/clubs/:id" element={<Protected><ClubDetails /></Protected>} />
+      {/* Protected actions / pages */}
+      <Route path="/posts/create" element={<ProtectedRoute><CreatePost /></ProtectedRoute>} />
+      <Route path="/clubs/create" element={<ProtectedRoute><CreateClub /></ProtectedRoute>} />
+      <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+      <Route path="/profile/edit" element={<ProtectedRoute><EditProfile /></ProtectedRoute>} />
     </Routes>
   );
 }

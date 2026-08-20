@@ -22,6 +22,7 @@ function PostDetails() {
   const dispatch = useDispatch();
   const post = useSelector((s) => s.posts.items.find((p) => p.id === Number(id)));
   const liked = useSelector((s) => s.posts.likedIds.includes(Number(id)));
+  const isAuthenticated = useSelector((s) => s.auth.isAuthenticated);
 
   if (!post) {
     return (
@@ -65,7 +66,10 @@ function PostDetails() {
           {/* I added the like button so users can like or unlike the review. */}
           <div className="flex items-center gap-4 mt-6 pt-4 border-t border-white/5">
             <button
-              onClick={() => dispatch(toggleLike(post.id))}
+              onClick={() => {
+                if (!isAuthenticated) return navigate('/login');
+                dispatch(toggleLike(post.id));
+              }}
               className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-colors text-sm font-medium ${
                 liked
                   ? "border-[#f6b042]/40 bg-[#f6b042]/10 text-[#f6b042]"
