@@ -1,20 +1,23 @@
 import { createSlice } from "@reduxjs/toolkit";
 
+const load = () => {
+  try { return JSON.parse(localStorage.getItem("watchlist")) ?? []; }
+  catch { return []; }
+};
+
 const watchlistSlice = createSlice({
   name: "watchlist",
-  initialState: {
-    items: [],
-  },
+  initialState: { items: load() },
   reducers: {
     toggleWatchlist: (state, action) => {
-      const item = action.payload;
-      const exists = state.items.some((movie) => movie.id === item.id);
-
+      const movie = action.payload;
+      const exists = state.items.some((m) => m.id === movie.id);
       if (exists) {
-        state.items = state.items.filter((movie) => movie.id !== item.id);
+        state.items = state.items.filter((m) => m.id !== movie.id);
       } else {
-        state.items.push(item);
+        state.items.push(movie);
       }
+      localStorage.setItem("watchlist", JSON.stringify(state.items));
     },
   },
 });
