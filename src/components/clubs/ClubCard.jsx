@@ -1,5 +1,4 @@
 import { useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
 import JoinClubButton from "./JoinClubButton";
 
 const GENRE_COLORS = {
@@ -13,12 +12,11 @@ const GENRE_COLORS = {
 
 function ClubCard({ club }) {
   const navigate = useNavigate();
-  const joined = useSelector((s) => s.clubs.joinedIds.includes(club.id));
   const genreClass = GENRE_COLORS[club.genre] ?? "bg-white/8 text-gray-300 border-white/10";
 
   return (
     <div
-      onClick={() => navigate(/clubs/${club.id})}
+      onClick={() => navigate(`/clubs/${club.id}`)}
       className="group bg-white/3 border border-white/5 rounded-2xl p-5 hover:border-white/15 hover:bg-white/5 transition-all cursor-pointer"
     >
       {/* Header */}
@@ -44,7 +42,7 @@ function ClubCard({ club }) {
           <span className="text-gray-700">·</span>
           <span>{club.posts} posts</span>
         </div>
-        <span className={px-2 py-0.5 rounded-full text-xs border ${genreClass}}>
+        <span className={`px-2 py-0.5 rounded-full text-xs border ${genreClass}`}>
           {club.genre}
         </span>
       </div>

@@ -67,7 +67,7 @@ function ClubDetails() {
             <div>
               <div className="flex items-center gap-2 mb-1">
                 <h1 className="text-2xl font-semibold text-white">{club.name}</h1>
-                <span className={px-2 py-0.5 rounded-full text-xs border ${genreClass}}>{club.genre}</span>
+                <span className={`px-2 py-0.5 rounded-full text-xs border ${genreClass}`}>{club.genre}</span>
               </div>
               <p className="text-gray-400 text-sm">Created by {club.createdBy}</p>
             </div>

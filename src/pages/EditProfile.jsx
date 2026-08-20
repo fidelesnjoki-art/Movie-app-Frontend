@@ -3,6 +3,15 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { updateProfile } from "../features/auth/authSlice";
 
+function Avatar({ displayName }) {
+  const initials = (displayName || "?").split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase();
+  return (
+    <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[#f6b042]/40 to-[#ff8c42]/20 flex items-center justify-center font-bold text-[#f6b042] text-2xl">
+      {initials}
+    </div>
+  );
+}
+
 function EditProfile() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -22,15 +31,6 @@ function EditProfile() {
 
   const inputClass = "w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-gray-100 placeholder-gray-500 focus:outline-none focus:border-[#f6b042]/50 focus:ring-1 focus:ring-[#f6b042]/20 text-sm transition-colors";
 
-  const Avatar = () => {
-    const initials = (name || user?.email || "?").split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase();
-    return (
-      <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[#f6b042]/40 to-[#ff8c42]/20 flex items-center justify-center font-bold text-[#f6b042] text-2xl">
-        {initials}
-      </div>
-    );
-  };
-
   return (
     <div className="min-h-screen bg-[#0b0b0d] text-gray-100">
       <div className="max-w-xl mx-auto px-6 py-10">
@@ -43,7 +43,7 @@ function EditProfile() {
 
           {/* Avatar preview */}
           <div className="flex items-center gap-4">
-            <Avatar />
+            <Avatar displayName={name || user?.email} />
             <div>
               <div className="text-sm text-white font-medium">{name || user?.email}</div>
               <div className="text-xs text-gray-500 mt-0.5">Avatar is generated from your name</div>
@@ -68,7 +68,7 @@ function EditProfile() {
                 onChange={(e) => setBio(e.target.value)}
                 placeholder="Tell the community about yourself…"
                 rows={3}
-                className={${inputClass} resize-none}
+                className={`${inputClass} resize-none`}
               />
               <span className="text-xs text-gray-600 text-right">{bio.length}/160</span>
             </div>
