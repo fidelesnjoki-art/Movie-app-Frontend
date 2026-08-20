@@ -35,7 +35,7 @@ function EditProfile() {
     <div className="min-h-screen bg-[#0b0b0d] text-gray-100">
       <div className="max-w-xl mx-auto px-6 py-10">
         <button onClick={() => navigate(-1)} className="text-sm text-gray-400 hover:text-white mb-6 inline-block transition-colors">
-          ← Back
+          Back
         </button>
         <h1 className="text-2xl font-semibold text-white mb-8">Edit Profile</h1>
 
@@ -80,7 +80,7 @@ function EditProfile() {
                   saved ? "bg-green-500/20 border border-green-500/30 text-green-400" : "bg-[#f6b042] text-black hover:bg-[#e09a2e]"
                 }`}
               >
-                {saved ? "✓ Saved!" : "Save Changes"}
+                {saved ? "Saved!" : "Save Changes"}
               </button>
               <button type="button" onClick={() => navigate(-1)} className="px-5 py-2.5 rounded-lg border border-white/10 text-gray-400 text-sm hover:text-white transition-colors">
                 Cancel

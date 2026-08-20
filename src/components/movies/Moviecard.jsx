@@ -44,7 +44,7 @@ function MovieCard({ movie }) {
         }`}
         title={inWatchlist ? "Remove from watchlist" : "Add to watchlist"}
       >
-        {inWatchlist ? "✓" : "+"}
+        {inWatchlist ? "In" : "+"}
       </button>
 
       <div className="p-3">

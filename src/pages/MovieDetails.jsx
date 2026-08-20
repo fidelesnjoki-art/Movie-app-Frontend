@@ -89,7 +89,7 @@ function MovieDetails() {
               {runtime && <><span className="text-gray-700">·</span><span>{runtime}</span></>}
               {director && <><span className="text-gray-700">·</span><span>dir. {director.name}</span></>}
               {movie.vote_average > 0 && (
-                <span className="text-[#f6b042] font-semibold">★ {movie.vote_average.toFixed(1)}</span>
+                <span className="text-[#f6b042] font-semibold">{movie.vote_average.toFixed(1)}</span>
               )}
             </div>
 
