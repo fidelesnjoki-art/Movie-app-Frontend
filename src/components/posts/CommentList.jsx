@@ -1,17 +1,20 @@
 // I imported the hooks and Redux actions so I can manage comments and the current user.
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import { addComment } from "../../features/posts/postsSlice";
 import Comment from "./Comment";
 
 function CommentList({ postId, comments = [] }) {
   const dispatch = useDispatch();
   const { user } = useSelector((s) => s.auth);
+  const navigate = useNavigate();
   const [body, setBody] = useState("");
 
   // I created this function to validate and add a new comment to the post.
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (!user) return navigate('/login');
     if (!body.trim()) return;
     dispatch(addComment({
       postId,
