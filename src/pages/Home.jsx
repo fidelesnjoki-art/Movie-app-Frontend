@@ -78,7 +78,6 @@ function LocalMovieCard({ movie }) {
 }
 
 function GenreRow({ genre }) {
-  const navigate = useNavigate();
   const genreMovies = moviesByGenre(genre).slice(0, 8);
   if (genreMovies.length === 0) return null;
 

@@ -1,5 +1,4 @@
 import { useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
 import JoinClubButton from "./JoinClubButton";
 
 const GENRE_COLORS = {
@@ -13,7 +12,6 @@ const GENRE_COLORS = {
 
 function ClubCard({ club }) {
   const navigate = useNavigate();
-  const joined = useSelector((s) => s.clubs.joinedIds.includes(club.id));
   const genreClass = GENRE_COLORS[club.genre] ?? "bg-white/8 text-gray-300 border-white/10";
 
   return (
