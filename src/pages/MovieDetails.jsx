@@ -22,7 +22,7 @@ function MovieDetails() {
     if (isTV) dispatch(fetchTVDetails(tmdbId));
     else dispatch(fetchMovieDetails(id));
     window.scrollTo(0, 0);
-  }, [dispatch, id]);
+  }, [dispatch, id, isTV, tmdbId]);
 
   if (status === "loading" || !movie) {
     return (
