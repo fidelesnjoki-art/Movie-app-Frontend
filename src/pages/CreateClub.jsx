@@ -40,7 +40,7 @@ function CreateClub() {
     <div className="min-h-screen bg-[#0b0b0d] text-gray-100">
       <div className="max-w-2xl mx-auto px-6 py-10">
         <button onClick={() => navigate(-1)} className="text-sm text-gray-400 hover:text-white mb-6 inline-block transition-colors">
-          ← Back
+          Back
         </button>
         <h1 className="text-2xl font-semibold text-white mb-2">Create a Film Club</h1>
         <p className="text-gray-400 text-sm mb-8">Build a community around the films you love.</p>

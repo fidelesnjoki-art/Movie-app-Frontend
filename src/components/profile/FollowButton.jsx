@@ -15,7 +15,7 @@ function FollowButton({ userId, size = "md" }) {
           : "bg-[#f6b042] text-black hover:bg-[#e09a2e]"
       }`}
     >
-      {following ? "Following ✓" : "Follow"}
+      {following ? "Following" : "Follow"}
     </button>
   );
 }

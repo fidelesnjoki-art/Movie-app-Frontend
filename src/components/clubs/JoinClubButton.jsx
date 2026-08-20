@@ -15,7 +15,7 @@ function JoinClubButton({ clubId, size = "md" }) {
           : "bg-[#f6b042] text-black hover:bg-[#e09a2e]"
       }`}
     >
-      {joined ? "Joined ✓" : "Join Club"}
+      {joined ? "Joined" : "Join Club"}
     </button>
   );
 }
