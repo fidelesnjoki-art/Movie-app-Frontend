@@ -40,7 +40,6 @@ function Register() {
             <label className="text-sm text-gray-400 font-medium">Name</label>
             <input
               type="text"
-              placeholder="Your name"
               value={name}
               onChange={(e) => setName(e.target.value)}
               className={inputClass}
@@ -51,7 +50,6 @@ function Register() {
             <label className="text-sm text-gray-400 font-medium">Email</label>
             <input
               type="email"
-              placeholder="you@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className={inputClass}
@@ -62,7 +60,6 @@ function Register() {
             <label className="text-sm text-gray-400 font-medium">Password</label>
             <input
               type="password"
-              placeholder="Create a password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className={inputClass}
