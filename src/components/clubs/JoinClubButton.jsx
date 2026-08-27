@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { toggleJoin } from "../../features/clubs/clubsSlice";
+import { toggleJoinRemote } from "../../features/clubs/clubsSlice";
 
 function JoinClubButton({ clubId, size = "md" }) {
   const dispatch = useDispatch();
@@ -11,7 +11,7 @@ function JoinClubButton({ clubId, size = "md" }) {
 
   return (
     <button
-      onClick={(e) => { e.stopPropagation(); if (!isAuthenticated) return navigate('/login'); dispatch(toggleJoin(clubId)); }}
+      onClick={(e) => { e.stopPropagation(); if (!isAuthenticated) return navigate('/login'); dispatch(toggleJoinRemote(clubId)); }}
       className={`${sizeClass} rounded-lg font-semibold transition-colors ${
         joined
           ? "bg-white/10 border border-white/15 text-gray-300 hover:bg-red-500/10 hover:border-red-500/30 hover:text-red-400"
