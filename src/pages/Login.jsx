@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { login } from "../features/auth/authSlice";
+import { backendApi } from "../services/api";
 import { Link, useNavigate } from "react-router-dom";
 
 function Login() {
@@ -12,14 +13,20 @@ function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!email || !password) {
       setError("Please fill in all fields.");
       return;
     }
-    dispatch(login({ email }));
-    navigate("/");
+    setError("");
+    try {
+      const tokens = await backendApi.login({ email, password });
+      dispatch(login({ user: { email }, ...tokens }));
+      navigate("/");
+    } catch (requestError) {
+      setError(requestError.message);
+    }
   };
 
   return (
