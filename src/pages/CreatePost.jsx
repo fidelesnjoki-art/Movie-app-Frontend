@@ -1,7 +1,7 @@
 // I imported the Redux and routing hooks so I can submit the review and navigate between pages.
 import { useDispatch } from "react-redux";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { addPost } from "../features/posts/postsSlice";
+import { createPost } from "../features/posts/postsSlice";
 import PostForm from "../components/posts/PostForm";
 
 function CreatePost() {
@@ -13,8 +13,8 @@ function CreatePost() {
   const movieId = params.get("movieId") ? Number(params.get("movieId")) : undefined;
 
   // I created this function to add the new review to the posts and return to the home page.
-  const handleSubmit = (post) => {
-    dispatch(addPost({ ...post, movieId }));
+  const handleSubmit = async (post) => {
+    await dispatch(createPost({ ...post, movieId })).unwrap();
     navigate("/");
   };
 

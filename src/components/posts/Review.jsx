@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from "react-redux";
-import { toggleLike } from "../../features/posts/postsSlice";
+import { toggleLikeRemote } from "../../features/posts/postsSlice";
 import Rating from "./Rating";
 
 const Avatar = ({ name }) => {
@@ -29,7 +29,7 @@ function Review({ post, linkToDetail = false }) {
           <p className="text-gray-400 text-sm mt-2 leading-relaxed line-clamp-4">{post.body}</p>
           <div className="flex items-center gap-4 mt-3">
             <button
-              onClick={() => dispatch(toggleLike(post.id))}
+              onClick={() => dispatch(toggleLikeRemote(post.id))}
               className={`flex items-center gap-1 text-xs transition-colors ${
                 liked ? "text-[#f6b042]" : "text-gray-500 hover:text-[#f6b042]"
               }`}

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, Link } from "react-router-dom";
 import { fetchTrending } from "../features/movies/moviesSlice";
-import { addPost } from "../features/posts/postsSlice";
+import { createPost, fetchPosts } from "../features/posts/postsSlice";
 import { toggleWatchlist } from "../features/watchlist/watchlistSlice";
 import { IMG_BASE, IMG_THUMB } from "../services/api";
 import { movies, moviesByGenre } from "../data/movies";
@@ -13,7 +13,10 @@ const GENRE_SECTIONS = ["C-Drama", "Drama", "Horror", "Sci-Fi", "Thriller", "Wor
 
 function WriteReviewModal({ onClose }) {
   const dispatch = useDispatch();
-  const handleSubmit = (post) => { dispatch(addPost(post)); onClose(); };
+  const handleSubmit = async (post) => {
+    await dispatch(createPost(post)).unwrap();
+    onClose();
+  };
   return (
     <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 px-4" onClick={onClose}>
       <div className="bg-[#141414] border border-white/10 rounded-2xl p-6 w-full max-w-md" onClick={(e) => e.stopPropagation()}>
@@ -107,7 +110,10 @@ function Home() {
   const [search, setSearch] = useState("");
   const [showModal, setShowModal] = useState(false);
 
-  useEffect(() => { dispatch(fetchTrending()); }, [dispatch]);
+  useEffect(() => {
+    dispatch(fetchTrending());
+    dispatch(fetchPosts());
+  }, [dispatch]);
 
   const featured = trending[0] ?? movies[0];
 

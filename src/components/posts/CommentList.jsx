@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { addComment } from "../../features/posts/postsSlice";
+import { addCommentRemote } from "../../features/posts/postsSlice";
 import Comment from "./Comment";
 
 function CommentList({ postId, comments = [] }) {
@@ -16,14 +16,7 @@ function CommentList({ postId, comments = [] }) {
     e.preventDefault();
     if (!user) return navigate('/login');
     if (!body.trim()) return;
-    dispatch(addComment({
-      postId,
-      comment: {
-        user: user?.name || user?.email || "Anonymous",
-        body: body.trim(),
-        createdAt: new Date().toLocaleDateString(),
-      },
-    }));
+    dispatch(addCommentRemote({ postId, body: body.trim() }));
     setBody("");
   };
 

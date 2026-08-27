@@ -12,22 +12,26 @@ function PostForm({ onSubmit, initialValues = {}, submitLabel = "Post Review" })
   const [error, setError] = useState("");
 
   // I added this function to validate the form and submit the review details.
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!movie.trim() || !body.trim()) {
       setError("Please fill in all fields.");
       return;
     }
-    onSubmit({
-      user: { name: user?.name || user?.email || "Anonymous" },
-      movie: movie.trim(),
-      body: body.trim(),
-      stars,
-    });
-    setMovie("");
-    setBody("");
-    setStars(5);
-    setError("");
+    try {
+      await onSubmit({
+        user: { name: user?.name || user?.email || "Anonymous" },
+        movie: movie.trim(),
+        body: body.trim(),
+        stars,
+      });
+      setMovie("");
+      setBody("");
+      setStars(5);
+      setError("");
+    } catch (requestError) {
+      setError(requestError.message);
+    }
   };
 
   return (

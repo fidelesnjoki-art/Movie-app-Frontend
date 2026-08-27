@@ -1,7 +1,7 @@
 // I imported the Redux hooks and Link so I can manage likes and navigate between posts and movies.
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
-import { toggleLike } from "../../features/posts/postsSlice";
+import { toggleLikeRemote } from "../../features/posts/postsSlice";
 import Rating from "./Rating";
 
 // I created the Avatar component to display the user's initials.
@@ -37,7 +37,7 @@ function PostCard({ post }) {
           <button
             onClick={() => {
               if (!isAuthenticated) return navigate('/login');
-              dispatch(toggleLike(post.id));
+              dispatch(toggleLikeRemote(post.id));
             }}
             className={`flex items-center gap-1 text-xs transition-colors ${
               liked ? "text-[#f6b042]" : "text-gray-500 hover:text-[#f6b042]"
