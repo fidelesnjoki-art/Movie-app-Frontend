@@ -1,6 +1,45 @@
 // I imported createSlice to manage the posts and their actions using Redux.
-import { createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { posts as seedPosts } from "../../data/posts";
+import { backendApi } from "../../services/api";
+
+const normalizePost = (post) => ({
+  id: post.id,
+  user: { name: post.user },
+  movie: post.movie_title,
+  movieId: post.movie_id,
+  movie_id: post.movie_id,
+  body: post.body,
+  stars: post.stars,
+  likes: post.like_count,
+  comments: post.comments?.length ?? 0,
+  commentList: post.comments ?? [],
+});
+
+export const fetchPosts = createAsyncThunk("posts/fetchPosts", async () => {
+  const response = await backendApi.listPosts();
+  return (Array.isArray(response) ? response : response.results ?? []).map(normalizePost);
+});
+
+export const createPost = createAsyncThunk("posts/createPost", async (post) => {
+  const response = await backendApi.createPost({
+    movie_id: Number(post.movieId || post.movie_id || 1),
+    movie_title: post.movie,
+    body: post.body,
+    stars: post.stars,
+  });
+  return normalizePost(response);
+});
+
+export const toggleLikeRemote = createAsyncThunk("posts/toggleLikeRemote", async (id, { getState }) => {
+  const liked = getState().posts.likedIds.includes(id);
+  const response = await backendApi.togglePostLike(id, liked);
+  return { id, liked: response.liked, likeCount: response.like_count };
+});
+
+export const addCommentRemote = createAsyncThunk("posts/addCommentRemote", async ({ postId, body }) => {
+  return backendApi.createComment(postId, { body });
+});
 
 const postsSlice = createSlice({
   name: "posts",
@@ -37,6 +76,27 @@ const postsSlice = createSlice({
     addPost: (state, action) => {
       state.items.unshift({ id: Date.now(), likes: 0, comments: 0, ...action.payload });
     },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchPosts.fulfilled, (state, action) => {
+        state.items = action.payload;
+      })
+      .addCase(createPost.fulfilled, (state, action) => { state.items.unshift(action.payload); })
+      .addCase(toggleLikeRemote.fulfilled, (state, action) => {
+        const { id, liked, likeCount } = action.payload;
+        const post = state.items.find((item) => item.id === id);
+        if (post) post.likes = likeCount;
+        if (liked && !state.likedIds.includes(id)) state.likedIds.push(id);
+        if (!liked) state.likedIds = state.likedIds.filter((itemId) => itemId !== id);
+      })
+      .addCase(addCommentRemote.fulfilled, (state, action) => {
+        const post = state.items.find((item) => item.id === action.meta.arg.postId);
+        if (post) {
+          post.commentList = [...(post.commentList ?? []), action.payload];
+          post.comments = post.commentList.length;
+        }
+      });
   },
 });
 

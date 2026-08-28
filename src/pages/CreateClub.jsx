@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { createClub } from "../features/clubs/clubsSlice";
+import { createClubRemote } from "../features/clubs/clubsSlice";
 
 const GENRES = ["Drama", "Horror", "Sci-Fi", "World", "Art House", "Noir", "Comedy", "Thriller", "Animation", "Documentary"];
 
@@ -16,22 +16,25 @@ function CreateClub() {
   const [featuredMovie, setFeaturedMovie] = useState("");
   const [error, setError] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!name.trim() || !description.trim() || !genre) {
       setError("Please fill in all required fields.");
       return;
     }
     const newClub = {
-      id: Date.now(),
       name: name.trim(),
       description: description.trim(),
       genre,
       featuredMovie: featuredMovie.trim() || "TBD",
       createdBy: user?.name || user?.email || "Anonymous",
     };
-    dispatch(createClub(newClub));
-    navigate("/clubs");
+    try {
+      await dispatch(createClubRemote(newClub)).unwrap();
+      navigate("/clubs");
+    } catch (requestError) {
+      setError(requestError.message);
+    }
   };
 
   const inputClass = "w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-gray-100 placeholder-gray-500 focus:outline-none focus:border-[#f6b042]/50 focus:ring-1 focus:ring-[#f6b042]/20 text-sm transition-colors";

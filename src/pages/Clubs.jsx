@@ -1,16 +1,21 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import ClubList from "../components/clubs/ClubList";
+import { fetchClubs } from "../features/clubs/clubsSlice";
 
 const GENRES = ["All", "Drama", "Horror", "Sci-Fi", "World", "Art House", "Noir"];
 
 function Clubs() {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const { items: clubs, joinedIds } = useSelector((s) => s.clubs);
   const [search, setSearch] = useState("");
   const [activeGenre, setActiveGenre] = useState("All");
   const [tab, setTab] = useState("all");
+
+  useEffect(() => { dispatch(fetchClubs()); }, [dispatch]);
 
   const filtered = clubs.filter((c) => {
     const matchesSearch =

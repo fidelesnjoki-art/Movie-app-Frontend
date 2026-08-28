@@ -1,7 +1,7 @@
 // I imported the routing hooks so I can get the post ID and navigate between pages.
 import { useParams, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { toggleLike } from "../features/posts/postsSlice";
+import { toggleLikeRemote } from "../features/posts/postsSlice";
 import Rating from "../components/posts/Rating";
 import CommentList from "../components/posts/CommentList";
 
@@ -68,7 +68,7 @@ function PostDetails() {
             <button
               onClick={() => {
                 if (!isAuthenticated) return navigate('/login');
-                dispatch(toggleLike(post.id));
+                dispatch(toggleLikeRemote(post.id));
               }}
               className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-colors text-sm font-medium ${
                 liked
