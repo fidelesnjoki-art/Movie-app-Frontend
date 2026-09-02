@@ -3,6 +3,9 @@ import { useDispatch } from "react-redux";
 import { login } from "../features/auth/authSlice";
 import { backendApi } from "../services/api";
 import { Link, useNavigate } from "react-router-dom";
+import { signInWithGoogle } from "../firebase";
+
+const demoGoogleUser = import.meta.env.VITE_GOOGLE_DEMO_EMAIL || "google.user@gmail.com";
 
 function Login() {
   const dispatch = useDispatch();
@@ -19,13 +22,38 @@ function Login() {
       setError("Please fill in all fields.");
       return;
     }
-    setError("");
+    dispatch(login({ email, name: email.split("@")[0] }));
+    navigate("/");
+  };
+
+  const handleGoogleLogin = async () => {
     try {
-      const tokens = await backendApi.login({ email, password });
-      dispatch(login({ user: { email }, ...tokens }));
+      const user = await signInWithGoogle();
+
+      if (!user) {
+        dispatch(
+          login({
+            name: "Google User",
+            email: demoGoogleUser,
+            provider: "google",
+          })
+        );
+        navigate("/");
+        return;
+      }
+
+      dispatch(
+        login({
+          name: user.displayName || user.email?.split("@")[0] || "Google User",
+          email: user.email || demoGoogleUser,
+          photoURL: user.photoURL,
+          provider: "google",
+        })
+      );
       navigate("/");
-    } catch (requestError) {
-      setError(requestError.message);
+    } catch (err) {
+      setError("Google sign-in failed. Check your Firebase config.");
+      console.error(err);
     }
   };
 
@@ -93,7 +121,11 @@ function Login() {
           <div className="flex-1 h-px bg-white/10" />
         </div>
 
-        <button className="w-full py-2.5 rounded-md border border-white/10 text-gray-300 hover:border-white/30 hover:text-white transition-colors text-sm">
+        <button
+          type="button"
+          onClick={handleGoogleLogin}
+          className="w-full py-2.5 rounded-md border border-white/10 text-gray-300 hover:border-white/30 hover:text-white transition-colors text-sm"
+        >
           Continue with Google
         </button>
 
