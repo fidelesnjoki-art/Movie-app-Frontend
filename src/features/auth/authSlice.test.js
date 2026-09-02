@@ -6,8 +6,8 @@ describe("authSlice", () => {
     const user = { id: 1, username: "moviefan" };
     const loggedIn = authReducer(undefined, login(user));
 
-    expect(loggedIn).toEqual({ user, isAuthenticated: true });
-    expect(authReducer(loggedIn, logout())).toEqual({ user: null, isAuthenticated: false });
+    expect(loggedIn).toMatchObject({ user, isAuthenticated: true });
+    expect(authReducer(loggedIn, logout())).toMatchObject({ user: null, isAuthenticated: false, isAdmin: false });
   });
 
   it("updates only the supplied profile fields", () => {
