@@ -12,10 +12,24 @@ import Clubs from "../pages/Clubs";
 import ClubDetails from "../pages/ClubDetails";
 import CreateClub from "../pages/CreateClub";
 import ProtectedRoute from "./ProtectedRoute";
+import AdminRoute from "./AdminRoute";
+
+import AdminDashboard from "../pages/admin/AdminDashboard";
+import AdminUsers from "../pages/admin/AdminUsers";
+import AdminClubs from "../pages/admin/AdminClubs";
+import AdminPosts from "../pages/admin/AdminPosts";
+import AdminReviews from "../pages/admin/AdminReviews";
+import AdminReports from "../pages/admin/AdminReports";
+import AdminAnalytics from "../pages/admin/AdminAnalytics";
+import AdminComments from "../pages/admin/AdminComments";
+import AdminLogin from "../pages/admin/AdminLogin";
+import AdminMovies from "../pages/admin/AdminMovies";
+import AdminActivities from "../pages/admin/AdminActivities";
 
 function AppRoutes() {
   return (
     <Routes>
+      {/* Public */}
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       {/* Public browsing routes */}
