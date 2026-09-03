@@ -1,6 +1,6 @@
 const BASE_URL = "https://api.themoviedb.org/3";
 const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL ?? "http://127.0.0.1:8000/api";
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000/api";
 
 export const IMG_BASE = "https://image.tmdb.org/t/p/w500";
 export const IMG_THUMB = "https://image.tmdb.org/t/p/w185";
