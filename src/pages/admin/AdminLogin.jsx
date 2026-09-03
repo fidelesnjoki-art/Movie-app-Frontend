@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { login } from "../../features/auth/authSlice";
-import adminApi, { getAdminErrorMessage } from "../../services/adminApi";
+import { backendApi } from "../../services/api";
 
 function AdminLogin() {
   const dispatch = useDispatch();
@@ -20,17 +20,17 @@ function AdminLogin() {
     setLoading(true);
     setError("");
     try {
-      const { data } = await adminApi.post("/api/auth/login/", { email, password });
+      const data = await backendApi.login({ email, password });
       const user = data.user ?? {};
       const isAdmin = user.is_staff || user.is_superuser || user.role === "admin" || user.role === "superuser";
       if (!isAdmin) {
         setError("Access denied. Admin privileges required.");
         return;
       }
-      dispatch(login({ token: data.access, ...user }));
-      navigate("/admin/dashboard");
+      dispatch(login(data));
+      navigate("/admin");
     } catch (err) {
-      setError(getAdminErrorMessage(err));
+      setError(err.message || "Login failed.");
     } finally {
       setLoading(false);
     }
