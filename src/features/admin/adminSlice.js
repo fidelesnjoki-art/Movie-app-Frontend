@@ -1,55 +1,60 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import adminApi, { getAdminErrorMessage } from "../../services/adminApi";
+import adminApi, { ADMIN_API_PREFIX, getAdminErrorMessage } from "../../services/adminApi";
 
 // ── Thunks ──────────────────────────────────────────────────────────────────
 
 export const fetchDashboard = createAsyncThunk("admin/fetchDashboard", async (_, { rejectWithValue }) => {
-  try { const { data } = await adminApi.get("/api/admin/dashboard/"); return data; }
+  try { const { data } = await adminApi.get(`${ADMIN_API_PREFIX}/dashboard/`); return data; }
   catch (e) { return rejectWithValue(getAdminErrorMessage(e)); }
 });
 
 export const fetchAdminUsers = createAsyncThunk("admin/fetchUsers", async (params = {}, { rejectWithValue }) => {
-  try { const { data } = await adminApi.get("/api/admin/users/", { params }); return data; }
+  try { const { data } = await adminApi.get(`${ADMIN_API_PREFIX}/users/`, { params }); return data; }
   catch (e) { return rejectWithValue(getAdminErrorMessage(e)); }
 });
 
 export const fetchAdminUser = createAsyncThunk("admin/fetchUser", async (id, { rejectWithValue }) => {
-  try { const { data } = await adminApi.get(`/api/admin/users/${id}/`); return data; }
+  try { const { data } = await adminApi.get(`${ADMIN_API_PREFIX}/users/${id}/`); return data; }
   catch (e) { return rejectWithValue(getAdminErrorMessage(e)); }
 });
 
 export const updateAdminUser = createAsyncThunk("admin/updateUser", async ({ id, payload }, { rejectWithValue }) => {
-  try { const { data } = await adminApi.patch(`/api/admin/users/${id}/`, payload); return data; }
+  try { const { data } = await adminApi.patch(`${ADMIN_API_PREFIX}/users/${id}/`, payload); return data; }
   catch (e) { return rejectWithValue(getAdminErrorMessage(e)); }
 });
 
 export const updateUserStatus = createAsyncThunk("admin/updateUserStatus", async ({ id, payload }, { rejectWithValue }) => {
-  try { const { data } = await adminApi.patch(`/api/admin/users/${id}/status/`, payload); return data; }
+  try { const { data } = await adminApi.patch(`${ADMIN_API_PREFIX}/users/${id}/status/`, payload); return data; }
   catch (e) { return rejectWithValue(getAdminErrorMessage(e)); }
 });
 
 export const deleteAdminUser = createAsyncThunk("admin/deleteUser", async (id, { rejectWithValue }) => {
-  try { await adminApi.delete(`/api/admin/users/${id}/`); return id; }
+  try { await adminApi.delete(`${ADMIN_API_PREFIX}/users/${id}/`); return id; }
   catch (e) { return rejectWithValue(getAdminErrorMessage(e)); }
 });
 
 export const fetchAdminMovies = createAsyncThunk("admin/fetchMovies", async (params = {}, { rejectWithValue }) => {
-  try { const { data } = await adminApi.get("/api/admin/movies/", { params }); return data; }
+  try { const { data } = await adminApi.get(`${ADMIN_API_PREFIX}/movies/`, { params }); return data; }
+  catch (e) { return rejectWithValue(getAdminErrorMessage(e)); }
+});
+
+export const fetchAdminActivities = createAsyncThunk("admin/fetchActivities", async (_, { rejectWithValue }) => {
+  try { const { data } = await adminApi.get(`${ADMIN_API_PREFIX}/activities/`); return data; }
   catch (e) { return rejectWithValue(getAdminErrorMessage(e)); }
 });
 
 export const createAdminMovie = createAsyncThunk("admin/createMovie", async (payload, { rejectWithValue }) => {
-  try { const { data } = await adminApi.post("/api/admin/movies/", payload); return data; }
+  try { const { data } = await adminApi.post(`${ADMIN_API_PREFIX}/movies/`, payload); return data; }
   catch (e) { return rejectWithValue(getAdminErrorMessage(e)); }
 });
 
 export const updateAdminMovie = createAsyncThunk("admin/updateMovie", async ({ id, payload }, { rejectWithValue }) => {
-  try { const { data } = await adminApi.patch(`/api/admin/movies/${id}/`, payload); return data; }
+  try { const { data } = await adminApi.patch(`${ADMIN_API_PREFIX}/movies/${id}/`, payload); return data; }
   catch (e) { return rejectWithValue(getAdminErrorMessage(e)); }
 });
 
 export const deleteAdminMovie = createAsyncThunk("admin/deleteMovie", async (id, { rejectWithValue }) => {
-  try { await adminApi.delete(`/api/admin/movies/${id}/`); return id; }
+  try { await adminApi.delete(`${ADMIN_API_PREFIX}/movies/${id}/`); return id; }
   catch (e) { return rejectWithValue(getAdminErrorMessage(e)); }
 });
 
@@ -143,6 +148,7 @@ const adminSlice = createSlice({
     dashboard: { data: null, status: "idle", error: null },
     users:     { ...listSlot(), selected: null },
     movies:    { ...listSlot() },
+    activities: { ...listSlot() },
     clubs:     { ...listSlot() },
     posts:     { ...listSlot() },
     reviews:   { ...listSlot() },
@@ -201,6 +207,16 @@ const adminSlice = createSlice({
         state.movies.items = state.movies.items.filter((m) => m.id !== id);
         state.movies.count = Math.max(0, state.movies.count - 1);
       });
+
+    // Activities
+    builder
+      .addCase(fetchAdminActivities.pending, pending("activities"))
+      .addCase(fetchAdminActivities.fulfilled, (state, { payload }) => {
+        state.activities.status = "succeeded";
+        state.activities.items = payload.results ?? [];
+        state.activities.count = payload.count ?? state.activities.items.length;
+      })
+      .addCase(fetchAdminActivities.rejected, failed("activities"));
 
     // Clubs
     builder

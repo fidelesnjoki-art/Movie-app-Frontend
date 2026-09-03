@@ -24,6 +24,7 @@ import AdminAnalytics from "../pages/admin/AdminAnalytics";
 import AdminComments from "../pages/admin/AdminComments";
 import AdminLogin from "../pages/admin/AdminLogin";
 import AdminMovies from "../pages/admin/AdminMovies";
+import AdminActivities from "../pages/admin/AdminActivities";
 
 const Protected = ({ children }) => <ProtectedRoute>{children}</ProtectedRoute>;
 const Admin = ({ children }) => <AdminRoute>{children}</AdminRoute>;
@@ -52,6 +53,7 @@ function AppRoutes() {
       <Route path="/admin/dashboard" element={<Admin><AdminDashboard /></Admin>} />
       <Route path="/admin/users" element={<Admin><AdminUsers /></Admin>} />
       <Route path="/admin/movies" element={<Admin><AdminMovies /></Admin>} />
+      <Route path="/admin/activities" element={<Admin><AdminActivities /></Admin>} />
       <Route path="/admin/clubs" element={<Admin><AdminClubs /></Admin>} />
       <Route path="/admin/posts" element={<Admin><AdminPosts /></Admin>} />
       <Route path="/admin/reviews" element={<Admin><AdminReviews /></Admin>} />

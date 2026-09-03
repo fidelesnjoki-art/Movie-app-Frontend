@@ -7,6 +7,7 @@ const NAV = [
   { to: "/admin/dashboard",  label: "Dashboard",  icon: "▦" },
   { to: "/admin/users",      label: "Users",      icon: "👥" },
   { to: "/admin/movies",     label: "Movies",     icon: "🎬" },
+  { to: "/admin/activities", label: "Activity Log", icon: "🕘" },
   { to: "/admin/clubs",      label: "Clubs",      icon: "🎭" },
   { to: "/admin/posts",      label: "Posts",      icon: "📝" },
   { to: "/admin/reviews",    label: "Reviews",    icon: "⭐" },

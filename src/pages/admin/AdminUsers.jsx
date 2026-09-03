@@ -127,8 +127,7 @@ function AdminUsers() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-white/5 text-gray-500 text-xs uppercase">
-                    <th className="text-left px-4 py-3">User</th>
-                    <th className="text-left px-4 py-3 hidden sm:table-cell">Email</th>
+                    <th className="text-left px-4 py-3">Email</th>
                     <th className="text-left px-4 py-3">Status</th>
                     <th className="text-right px-4 py-3">Actions</th>
                   </tr>
@@ -136,8 +135,7 @@ function AdminUsers() {
                 <tbody>
                   {items.map((u) => (
                     <tr key={u.id} className="border-b border-white/5 hover:bg-white/2 transition-colors">
-                      <td className="px-4 py-3 text-gray-200">{u.name || u.email}</td>
-                      <td className="px-4 py-3 text-gray-400 hidden sm:table-cell">{u.email}</td>
+                      <td className="px-4 py-3 text-gray-200">{u.email}</td>
                       <td className="px-4 py-3"><StatusBadge status={u.is_active ? "active" : "inactive"} /></td>
                       <td className="px-4 py-3">
                         <div className="flex gap-2 justify-end flex-wrap">

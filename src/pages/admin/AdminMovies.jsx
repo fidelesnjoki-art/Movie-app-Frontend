@@ -112,8 +112,8 @@ function AdminMovies() {
                   </tr>
                 </thead>
                 <tbody>
-                  {items.map((m) => (
-                    <tr key={m.id} className="border-b border-white/5 hover:bg-white/2 transition-colors">
+                  {items.map((m, index) => (
+                    <tr key={`${m.id ?? m.tmdb_id ?? m.title ?? "movie"}-${index}`} className="border-b border-white/5 hover:bg-white/2 transition-colors">
                       <td className="px-4 py-3 text-gray-200">{m.title}</td>
                       <td className="px-4 py-3 text-gray-400 capitalize hidden sm:table-cell">{m.media_type ?? m.type ?? "—"}</td>
                       <td className="px-4 py-3 text-gray-400 hidden md:table-cell">{m.genre ?? "—"}</td>
