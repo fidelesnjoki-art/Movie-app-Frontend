@@ -9,6 +9,7 @@ function MovieCard({ movie }) {
   const inWatchlist = useSelector((s) =>
     s.watchlist.items.some((m) => m.id === movie.id)
   );
+  const isAuthenticated = useSelector((s) => s.auth.isAuthenticated);
 
   const poster = movie.img ?? (movie.poster_path ? `${IMG_THUMB}${movie.poster_path}` : null);
 
@@ -35,6 +36,7 @@ function MovieCard({ movie }) {
       <button
         onClick={(e) => {
           e.stopPropagation();
+          if (!isAuthenticated) return navigate('/login');
           dispatch(toggleWatchlist({ id: movie.id, title: movie.title, poster_path: movie.poster_path }));
         }}
         className={`absolute top-2 right-2 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-all shadow-lg ${
@@ -44,7 +46,7 @@ function MovieCard({ movie }) {
         }`}
         title={inWatchlist ? "Remove from watchlist" : "Add to watchlist"}
       >
-        {inWatchlist ? "✓" : "+"}
+        {inWatchlist ? "In" : "+"}
       </button>
 
       <div className="p-3">

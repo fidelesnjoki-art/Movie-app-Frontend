@@ -26,40 +26,25 @@ import AdminLogin from "../pages/admin/AdminLogin";
 import AdminMovies from "../pages/admin/AdminMovies";
 import AdminActivities from "../pages/admin/AdminActivities";
 
-const Protected = ({ children }) => <ProtectedRoute>{children}</ProtectedRoute>;
-const Admin = ({ children }) => <AdminRoute>{children}</AdminRoute>;
-
 function AppRoutes() {
   return (
     <Routes>
       {/* Public */}
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      {/* Public browsing routes */}
+      <Route path="/" element={<Home />} />
+      <Route path="/discover" element={<Discover />} />
+      <Route path="/movies/:id" element={<MovieDetails />} />
+      <Route path="/posts/:id" element={<PostDetails />} />
+      <Route path="/clubs" element={<Clubs />} />
+      <Route path="/clubs/:id" element={<ClubDetails />} />
 
-      {/* User routes */}
-      <Route path="/" element={<Protected><Home /></Protected>} />
-      <Route path="/discover" element={<Protected><Discover /></Protected>} />
-      <Route path="/profile" element={<Protected><Profile /></Protected>} />
-      <Route path="/profile/edit" element={<Protected><EditProfile /></Protected>} />
-      <Route path="/movies/:id" element={<Protected><MovieDetails /></Protected>} />
-      <Route path="/posts/create" element={<Protected><CreatePost /></Protected>} />
-      <Route path="/posts/:id" element={<Protected><PostDetails /></Protected>} />
-      <Route path="/clubs" element={<Protected><Clubs /></Protected>} />
-      <Route path="/clubs/create" element={<Protected><CreateClub /></Protected>} />
-      <Route path="/clubs/:id" element={<Protected><ClubDetails /></Protected>} />
-
-      {/* Admin routes */}
-      <Route path="/admin/login" element={<AdminLogin />} />
-      <Route path="/admin/dashboard" element={<Admin><AdminDashboard /></Admin>} />
-      <Route path="/admin/users" element={<Admin><AdminUsers /></Admin>} />
-      <Route path="/admin/movies" element={<Admin><AdminMovies /></Admin>} />
-      <Route path="/admin/activities" element={<Admin><AdminActivities /></Admin>} />
-      <Route path="/admin/clubs" element={<Admin><AdminClubs /></Admin>} />
-      <Route path="/admin/posts" element={<Admin><AdminPosts /></Admin>} />
-      <Route path="/admin/reviews" element={<Admin><AdminReviews /></Admin>} />
-      <Route path="/admin/comments" element={<Admin><AdminComments /></Admin>} />
-      <Route path="/admin/reports" element={<Admin><AdminReports /></Admin>} />
-      <Route path="/admin/analytics" element={<Admin><AdminAnalytics /></Admin>} />
+      {/* Protected actions / pages */}
+      <Route path="/posts/create" element={<ProtectedRoute><CreatePost /></ProtectedRoute>} />
+      <Route path="/clubs/create" element={<ProtectedRoute><CreateClub /></ProtectedRoute>} />
+      <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+      <Route path="/profile/edit" element={<ProtectedRoute><EditProfile /></ProtectedRoute>} />
     </Routes>
   );
 }

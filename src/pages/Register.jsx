@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { login } from "../features/auth/authSlice";
+import { backendApi } from "../services/api";
 import { Link, useNavigate } from "react-router-dom";
 
 function Register() {
@@ -12,14 +13,21 @@ function Register() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!name || !email || !password) {
       setError("Please fill in all fields.");
       return;
     }
-    dispatch(login({ name, email }));
-    navigate("/");
+    setError("");
+    try {
+      await backendApi.register({ name, email, password });
+      const tokens = await backendApi.login({ email, password });
+      dispatch(login({ user: { name, email }, ...tokens }));
+      navigate("/");
+    } catch (requestError) {
+      setError(requestError.message);
+    }
   };
 
   const inputClass =
@@ -40,7 +48,6 @@ function Register() {
             <label className="text-sm text-gray-400 font-medium">Name</label>
             <input
               type="text"
-              placeholder="Your name"
               value={name}
               onChange={(e) => setName(e.target.value)}
               className={inputClass}
@@ -51,7 +58,6 @@ function Register() {
             <label className="text-sm text-gray-400 font-medium">Email</label>
             <input
               type="email"
-              placeholder="you@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className={inputClass}
@@ -62,7 +68,6 @@ function Register() {
             <label className="text-sm text-gray-400 font-medium">Password</label>
             <input
               type="password"
-              placeholder="Create a password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className={inputClass}

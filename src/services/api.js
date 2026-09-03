@@ -1,5 +1,6 @@
 const BASE_URL = "https://api.themoviedb.org/3";
 const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000/api";
 
 export const IMG_BASE = "https://image.tmdb.org/t/p/w500";
 export const IMG_THUMB = "https://image.tmdb.org/t/p/w185";
@@ -22,4 +23,68 @@ export const tmdbApi = {
   searchTV: (query, page = 1) => tmdb("/search/tv", { query, page }),
   getGenres: () => tmdb("/genre/movie/list"),
   discoverByGenre: (genreId, page = 1) => tmdb("/discover/movie", { with_genres: genreId, sort_by: "popularity.desc", page }),
+};
+
+async function backendRequest(path, options = {}) {
+  const token = localStorage.getItem("accessToken");
+  const headers = new Headers(options.headers);
+
+  if (options.body && !headers.has("Content-Type")) {
+    headers.set("Content-Type", "application/json");
+  }
+  if (token) headers.set("Authorization", `Bearer ${token}`);
+
+  const response = await fetch(`${BACKEND_URL}${path}`, { ...options, headers });
+  const data = await response.json().catch(() => null);
+
+  if (!response.ok) {
+    const message = data?.detail || Object.values(data ?? {}).flat().join(" ") || `API ${response.status}`;
+    throw new Error(message);
+  }
+  return data;
+}
+
+export const backendApi = {
+  health: () => backendRequest("/"),
+  register: (payload) => backendRequest("/auth/register/", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  }),
+  login: (payload) => backendRequest("/auth/login/", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  }),
+  refresh: (refresh) => backendRequest("/auth/token/refresh/", {
+    method: "POST",
+    body: JSON.stringify({ refresh }),
+  }),
+  profile: (id) => backendRequest(`/users/${id}/`),
+  listPosts: () => backendRequest("/posts/"),
+  createPost: (payload) => backendRequest("/posts/", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  }),
+  togglePostLike: (id, liked) => backendRequest(`/posts/${id}/like/`, {
+    method: liked ? "DELETE" : "POST",
+  }),
+  createComment: (postId, payload) => backendRequest(`/posts/${postId}/comments/`, {
+    method: "POST",
+    body: JSON.stringify(payload),
+  }),
+  listClubs: () => backendRequest("/clubs/"),
+  createClub: (payload) => backendRequest("/clubs/", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  }),
+  toggleClubMembership: (id, joined) => backendRequest(`/clubs/${id}/join/`, {
+    method: joined ? "DELETE" : "POST",
+  }),
+  listWatchlist: () => backendRequest("/watchlist/"),
+  addWatchlist: (payload) => backendRequest("/watchlist/", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  }),
+  removeWatchlist: (id) => backendRequest(`/watchlist/${id}/`, {
+    method: "DELETE",
+  }),
 };

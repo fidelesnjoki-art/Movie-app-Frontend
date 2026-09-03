@@ -1,16 +1,21 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import ClubList from "../components/clubs/ClubList";
+import { fetchClubs } from "../features/clubs/clubsSlice";
 
 const GENRES = ["All", "Drama", "Horror", "Sci-Fi", "World", "Art House", "Noir"];
 
 function Clubs() {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const { items: clubs, joinedIds } = useSelector((s) => s.clubs);
   const [search, setSearch] = useState("");
   const [activeGenre, setActiveGenre] = useState("All");
   const [tab, setTab] = useState("all");
+
+  useEffect(() => { dispatch(fetchClubs()); }, [dispatch]);
 
   const filtered = clubs.filter((c) => {
     const matchesSearch =
@@ -41,11 +46,10 @@ function Clubs() {
 
         {/* Search */}
         <div className="relative mb-4">
-          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">🔍</span>
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search clubs…"
+            placeholder="Search clubs..."
             className="w-full pl-9 pr-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-gray-100 placeholder-gray-500 focus:outline-none focus:border-[#f6b042]/50 focus:ring-1 focus:ring-[#f6b042]/20 transition-colors text-sm"
           />
         </div>

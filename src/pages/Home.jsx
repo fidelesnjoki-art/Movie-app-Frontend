@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, Link } from "react-router-dom";
 import { fetchTrending } from "../features/movies/moviesSlice";
-import { addPost } from "../features/posts/postsSlice";
+import { createPost, fetchPosts } from "../features/posts/postsSlice";
 import { toggleWatchlist } from "../features/watchlist/watchlistSlice";
 import { IMG_BASE, IMG_THUMB } from "../services/api";
 import { movies, moviesByGenre } from "../data/movies";
@@ -13,13 +13,16 @@ const GENRE_SECTIONS = ["C-Drama", "Drama", "Horror", "Sci-Fi", "Thriller", "Wor
 
 function WriteReviewModal({ onClose }) {
   const dispatch = useDispatch();
-  const handleSubmit = (post) => { dispatch(addPost(post)); onClose(); };
+  const handleSubmit = async (post) => {
+    await dispatch(createPost(post)).unwrap();
+    onClose();
+  };
   return (
     <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 px-4" onClick={onClose}>
       <div className="bg-[#141414] border border-white/10 rounded-2xl p-6 w-full max-w-md" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-5">
           <h2 className="text-white font-semibold text-lg">Write a Review</h2>
-              <button onClick={onClose} className="text-gray-500 hover:text-white transition-colors">X</button>
+          <button onClick={onClose} className="text-gray-500 hover:text-white transition-colors">X</button>
         </div>
         <PostForm onSubmit={handleSubmit} submitLabel="Publish Review" />
       </div>
@@ -37,7 +40,6 @@ const Avatar = ({ name, size = "md" }) => {
   );
 };
 
-// Small local movie card (no TMDB needed)
 function LocalMovieCard({ movie }) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -85,10 +87,7 @@ function GenreRow({ genre }) {
     <section className="mb-8">
       <div className="flex items-center justify-between mb-3">
         <h2 className="text-base font-semibold text-white">{genre}</h2>
-        <Link
-          to={`/discover`}
-          className="text-xs text-gray-500 hover:text-[#f6b042] transition-colors"
-        >
+        <Link to="/discover" className="text-xs text-gray-500 hover:text-[#f6b042] transition-colors">
           See all
         </Link>
       </div>
@@ -111,7 +110,10 @@ function Home() {
   const [search, setSearch] = useState("");
   const [showModal, setShowModal] = useState(false);
 
-  useEffect(() => { dispatch(fetchTrending()); }, [dispatch]);
+  useEffect(() => {
+    dispatch(fetchTrending());
+    dispatch(fetchPosts());
+  }, [dispatch]);
 
   const featured = trending[0] ?? movies[0];
 
@@ -130,8 +132,6 @@ function Home() {
 
   return (
     <div className="min-h-screen bg-[#0b0b0d] text-gray-100">
-
-      {/* Hero */}
       <header className="relative border-b border-white/5 overflow-hidden">
         {featured?.backdrop_path && trending.length > 0 ? (
           <img src={`${IMG_BASE}${featured.backdrop_path}`} alt={featured.title}
@@ -140,12 +140,9 @@ function Home() {
           <div className="absolute inset-0 bg-gradient-to-br from-[#1a1008] via-[#0f0d0b] to-[#0b0b0d]" />
         )}
         <div className="absolute inset-0 bg-gradient-to-r from-[#0b0b0d] via-[#0b0b0d]/75 to-transparent" />
-
         <div className="relative max-w-6xl mx-auto px-6 py-14 flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
           <div className="max-w-xl">
-            <div className="text-[#f6b042] text-xs font-semibold tracking-widest uppercase mb-3">
-              Featured Film
-            </div>
+            <div className="text-[#f6b042] text-xs font-semibold tracking-widest uppercase mb-3">Featured Film</div>
             <h1 className="text-4xl md:text-5xl font-serif font-light text-white leading-tight mb-2">
               {featured?.title ?? "Welcome to Cinéma"}
             </h1>
@@ -156,63 +153,44 @@ function Home() {
               {featured?.director && ` · ${featured.director}`}
             </p>
             <div className="flex gap-3">
-              <button
-                onClick={() => navigate(`/movies/${featured.id}`)}
-                className="px-5 py-2 rounded-lg bg-[#f6b042] text-black font-semibold text-sm hover:bg-[#e09a2e] transition-colors"
-              >
+              <button onClick={() => navigate(`/movies/${featured.id}`)}
+                className="px-5 py-2 rounded-lg bg-[#f6b042] text-black font-semibold text-sm hover:bg-[#e09a2e] transition-colors">
                 View Film
               </button>
-              <button
-                onClick={() => setShowModal(true)}
-                className="px-5 py-2 rounded-lg border border-white/15 text-gray-300 text-sm hover:border-white/30 hover:text-white transition-colors"
-              >
+              <button onClick={() => setShowModal(true)}
+                className="px-5 py-2 rounded-lg border border-white/15 text-gray-300 text-sm hover:border-white/30 hover:text-white transition-colors">
                 Write Review
               </button>
             </div>
           </div>
-
-          <input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
+          <input value={search} onChange={(e) => setSearch(e.target.value)}
             placeholder="Search reviews, films…"
-            className="w-full md:w-80 px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-gray-100 placeholder-gray-500 focus:outline-none focus:border-[#f6b042]/50 focus:ring-1 focus:ring-[#f6b042]/20 transition-colors text-sm"
-          />
+            className="w-full md:w-80 px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-gray-100 placeholder-gray-500 focus:outline-none focus:border-[#f6b042]/50 focus:ring-1 focus:ring-[#f6b042]/20 transition-colors text-sm" />
         </div>
       </header>
 
       <main className="max-w-6xl mx-auto px-6 py-8 grid grid-cols-1 md:grid-cols-[1fr_300px] gap-8">
-
-        {/* Left column */}
         <div>
-          {/* Genre rows */}
           {!search.trim() && (
             <div className="mb-6">
-              {GENRE_SECTIONS.map((genre) => (
-                <GenreRow key={genre} genre={genre} />
-              ))}
+              {GENRE_SECTIONS.map((genre) => <GenreRow key={genre} genre={genre} />)}
             </div>
           )}
-
-          {/* Feed */}
           <div>
             <div className="flex gap-6 mb-5 border-b border-white/8">
               {["feed", "trending"].map((tab) => (
                 <button key={tab} onClick={() => setActiveTab(tab)}
                   className={`pb-3 text-sm font-medium capitalize transition-colors border-b-2 -mb-px ${
                     activeTab === tab ? "border-[#f6b042] text-white" : "border-transparent text-gray-500 hover:text-gray-300"
-                  }`}
-                >
+                  }`}>
                   {tab === "feed" ? "Latest Reviews" : "Most Liked"}
                 </button>
               ))}
-              <button
-                onClick={() => setShowModal(true)}
-                className="ml-auto mb-3 px-3 py-1 rounded-lg bg-white/5 border border-white/10 text-gray-400 text-xs hover:text-white hover:border-white/20 transition-colors"
-              >
+              <button onClick={() => setShowModal(true)}
+                className="ml-auto mb-3 px-3 py-1 rounded-lg bg-white/5 border border-white/10 text-gray-400 text-xs hover:text-white hover:border-white/20 transition-colors">
                 Write Review
               </button>
             </div>
-
             {sorted.length === 0 ? (
               <p className="text-gray-500 text-sm">No reviews found.</p>
             ) : (
@@ -222,6 +200,7 @@ function Home() {
             )}
           </div>
         </div>
+
         <aside className="space-y-4">
           {user && (
             <div className="bg-[#f6b042]/8 border border-[#f6b042]/15 rounded-xl p-4 flex items-center gap-3">
@@ -247,20 +226,17 @@ function Home() {
                   <li key={`${movie.id}-${i}`} onClick={() => navigate(`/movies/${movie.id}`)}
                     className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm cursor-pointer transition-colors ${
                       i === 0 ? "bg-[#f6b042]/10 text-[#f6b042]" : "text-gray-300 hover:bg-white/5"
-                    }`}
-                  >
+                    }`}>
                     <span className="text-xs text-gray-600 w-4 shrink-0">{i + 1}</span>
                     <span className="truncate">{movie.title}</span>
                     <span className="text-xs text-gray-600 ml-auto shrink-0">
-                      ★ {movie.vote_average?.toFixed(1) ?? movie.rating}
+                      {movie.vote_average?.toFixed(1) ?? movie.rating}
                     </span>
                   </li>
                 ))}
               </ul>
             )}
           </div>
-
-          {/* Quick stats */}
           <div className="bg-white/3 border border-white/5 rounded-xl p-4">
             <h4 className="text-sm font-semibold text-white mb-3">In the Library</h4>
             <div className="grid grid-cols-2 gap-3">
@@ -281,11 +257,8 @@ function Home() {
             <h4 className="text-sm font-semibold text-white mb-3">Browse by Genre</h4>
             <div className="flex flex-wrap gap-2">
               {GENRE_SECTIONS.map((g) => (
-                <Link
-                  key={g}
-                  to="/discover"
-                  className="px-2.5 py-1 rounded-full bg-white/5 border border-white/8 text-xs text-gray-400 hover:text-white hover:border-white/20 transition-colors"
-                >
+                <Link key={g} to="/discover"
+                  className="px-2.5 py-1 rounded-full bg-white/5 border border-white/8 text-xs text-gray-400 hover:text-white hover:border-white/20 transition-colors">
                   {g}
                 </Link>
               ))}
