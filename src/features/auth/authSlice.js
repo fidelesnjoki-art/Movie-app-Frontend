@@ -1,7 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-const storedUser = localStorage.getItem("currentUser");
-const storedAccessToken = localStorage.getItem("accessToken");
+const getStored = (key) => (typeof localStorage !== "undefined" ? localStorage.getItem(key) : null);
+const storedUser = getStored("currentUser");
+const storedAccessToken = getStored("accessToken");
 
 const initialState = {
   user: storedUser ? JSON.parse(storedUser) : null,
@@ -14,22 +15,28 @@ const authSlice = createSlice({
   initialState,
   reducers: {
     login: (state, action) => {
-      const { user, access, refresh } = action.payload;
+      const user = action.payload?.user ?? action.payload;
+      const access = action.payload?.access ?? action.payload?.accessToken ?? null;
+      const refresh = action.payload?.refresh;
       state.user = user;
       state.accessToken = access;
       state.isAuthenticated = true;
-      localStorage.setItem("currentUser", JSON.stringify(user));
-      localStorage.setItem("accessToken", access);
-      if (refresh) localStorage.setItem("refreshToken", refresh);
+      if (typeof localStorage !== "undefined") {
+        localStorage.setItem("currentUser", JSON.stringify(user));
+        if (access) localStorage.setItem("accessToken", access);
+        if (refresh) localStorage.setItem("refreshToken", refresh);
+      }
     },
 
     logout: (state) => {
       state.user = null;
       state.accessToken = null;
       state.isAuthenticated = false;
-      localStorage.removeItem("currentUser");
-      localStorage.removeItem("accessToken");
-      localStorage.removeItem("refreshToken");
+      if (typeof localStorage !== "undefined") {
+        localStorage.removeItem("currentUser");
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
+      }
     },
     updateProfile: (state, action) => {
       state.user = { ...state.user, ...action.payload };
