@@ -5,8 +5,6 @@ import { backendApi } from "../services/api";
 import { Link, useNavigate } from "react-router-dom";
 import { signInWithGoogle } from "../firebase";
 
-const demoGoogleUser = import.meta.env.VITE_GOOGLE_DEMO_EMAIL || "google.user@gmail.com";
-
 function Login() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -15,6 +13,7 @@ function Login() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -22,38 +21,55 @@ function Login() {
       setError("Please fill in all fields.");
       return;
     }
-    dispatch(login({ email, name: email.split("@")[0] }));
-    navigate("/");
+    setError("");
+    setLoading(true);
+    try {
+      const tokens = await backendApi.login({ email, password });
+      dispatch(login(tokens));
+      navigate("/");
+    } catch (err) {
+      setError(err.message || "Invalid email or password.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleGoogleLogin = async () => {
+    setError("");
+    setLoading(true);
     try {
       const user = await signInWithGoogle();
-
       if (!user) {
-        dispatch(
-          login({
-            name: "Google User",
-            email: demoGoogleUser,
-            provider: "google",
-          })
-        );
-        navigate("/");
+        setError("Google sign-in was cancelled.");
         return;
       }
-
-      dispatch(
-        login({
-          name: user.displayName || user.email?.split("@")[0] || "Google User",
-          email: user.email || demoGoogleUser,
-          photoURL: user.photoURL,
-          provider: "google",
-        })
-      );
+      // Register or login via backend using Google token
+      const idToken = await user.getIdToken();
+      try {
+        const tokens = await backendApi.googleAuth(idToken);
+        dispatch(login(tokens));
+      } catch {
+        // Fallback: register then login if googleAuth endpoint doesn't exist yet
+        try {
+          await backendApi.register({
+            name: user.displayName || user.email.split("@")[0],
+            email: user.email,
+            password: idToken.slice(0, 20) + "Aa1!",
+          });
+        } catch {
+          // user may already exist, continue to login
+        }
+        const tokens = await backendApi.login({
+          email: user.email,
+          password: idToken.slice(0, 20) + "Aa1!",
+        });
+        dispatch(login(tokens));
+      }
       navigate("/");
     } catch (err) {
-      setError("Google sign-in failed. Check your Firebase config.");
-      console.error(err);
+      setError(err.message || "Google sign-in failed. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -63,7 +79,7 @@ function Login() {
 
         <div className="text-center">
           <div className="text-[#f6b042] font-bold tracking-widest text-xl mb-4">CINÉMA</div>
-          <h1 className="text-2xl font-semibold text-white">Welcome back </h1>
+          <h1 className="text-2xl font-semibold text-white">Welcome back</h1>
           <p className="text-gray-400 text-sm mt-1">Sign in to continue your movie journey.</p>
         </div>
 
@@ -72,7 +88,6 @@ function Login() {
             <label className="text-sm text-gray-400 font-medium">Email</label>
             <input
               type="email"
-              // placeholder="you@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full px-4 py-2.5 rounded-md bg-white/5 border border-white/10 text-gray-100 placeholder-gray-500 focus:outline-none focus:border-[#f6b042]/60 focus:ring-1 focus:ring-[#f6b042]/30 transition-colors"
@@ -84,7 +99,6 @@ function Login() {
             <div className="relative">
               <input
                 type={showPassword ? "text" : "password"}
-                // placeholder="Enter your password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full px-4 py-2.5 pr-16 rounded-md bg-white/5 border border-white/10 text-gray-100 placeholder-gray-500 focus:outline-none focus:border-[#f6b042]/60 focus:ring-1 focus:ring-[#f6b042]/30 transition-colors"
@@ -99,19 +113,14 @@ function Login() {
             </div>
           </div>
 
-          <div className="text-right">
-            <Link to="/forgot-password" className="text-xs text-[#f6b042] hover:underline">
-              Forgot password?
-            </Link>
-          </div>
-
           {error && <p className="text-red-400 text-sm">{error}</p>}
 
           <button
             type="submit"
-            className="w-full py-2.5 rounded-md bg-[#f6b042] text-black font-semibold hover:bg-[#e09a2e] transition-colors"
+            disabled={loading}
+            className="w-full py-2.5 rounded-md bg-[#f6b042] text-black font-semibold hover:bg-[#e09a2e] transition-colors disabled:opacity-50"
           >
-            Log In
+            {loading ? "Signing in…" : "Log In"}
           </button>
         </form>
 
@@ -124,7 +133,8 @@ function Login() {
         <button
           type="button"
           onClick={handleGoogleLogin}
-          className="w-full py-2.5 rounded-md border border-white/10 text-gray-300 hover:border-white/30 hover:text-white transition-colors text-sm"
+          disabled={loading}
+          className="w-full py-2.5 rounded-md border border-white/10 text-gray-300 hover:border-white/30 hover:text-white transition-colors text-sm disabled:opacity-50"
         >
           Continue with Google
         </button>
