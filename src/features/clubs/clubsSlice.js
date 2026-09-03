@@ -1,13 +1,13 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { clubs as seedClubs } from "../../data/clubs";
 import { backendApi } from "../../services/api";
 
 export const fetchClubs = createAsyncThunk("clubs/fetchClubs", async () => {
   const response = await backendApi.listClubs();
   return (Array.isArray(response) ? response : response.results ?? []).map((club) => ({
     ...club,
-    members: club.member_count,
-    createdBy: club.created_by,
+    members: club.member_count ?? 0,
+    posts: club.post_count ?? 0,
+    createdBy: club.created_by?.name || club.created_by,
   }));
 });
 
@@ -23,14 +23,26 @@ export const createClubRemote = createAsyncThunk("clubs/createClubRemote", async
     description: club.description,
     genre: club.genre,
   });
-  return { ...response, members: response.member_count, createdBy: response.created_by };
+  return {
+    ...response,
+    members: response.member_count ?? 1,
+    posts: response.post_count ?? 0,
+    createdBy: response.created_by?.name || response.created_by,
+  };
+});
+
+export const deleteClubRemote = createAsyncThunk("clubs/deleteClubRemote", async (id) => {
+  await backendApi.deleteClub(id);
+  return id;
 });
 
 const clubsSlice = createSlice({
   name: "clubs",
   initialState: {
-    items: seedClubs,
+    items: [],
     joinedIds: [],
+    status: "idle",
+    error: null,
   },
   reducers: {
     toggleJoin: (state, action) => {
@@ -45,16 +57,6 @@ const clubsSlice = createSlice({
         club.members += 1;
       }
     },
-    createClub: (state, action) => {
-      state.items.unshift({
-        id: Date.now(),
-        members: 1,
-        posts: 0,
-        banner: null,
-        ...action.payload,
-      });
-      state.joinedIds.push(action.payload.id ?? Date.now());
-    },
     addClubPost: (state, action) => {
       const { clubId } = action.payload;
       const club = state.items.find((c) => c.id === clubId);
@@ -62,25 +64,37 @@ const clubsSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    builder.addCase(fetchClubs.fulfilled, (state, action) => {
-      state.items = action.payload;
-    }).addCase(toggleJoinRemote.fulfilled, (state, action) => {
-      const { id, joined } = action.payload;
-      const club = state.items.find((item) => item.id === id);
-      if (!club) return;
-      if (joined) {
-        state.joinedIds.push(id);
-        club.members += 1;
-      } else {
-        state.joinedIds = state.joinedIds.filter((itemId) => itemId !== id);
-        club.members = Math.max(0, club.members - 1);
-      }
-    }).addCase(createClubRemote.fulfilled, (state, action) => {
-      state.items.unshift(action.payload);
-      state.joinedIds.push(action.payload.id);
-    });
+    builder
+      .addCase(fetchClubs.pending, (state) => { state.status = "loading"; state.error = null; })
+      .addCase(fetchClubs.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.items = action.payload;
+      })
+      .addCase(fetchClubs.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.error.message;
+      })
+      .addCase(toggleJoinRemote.fulfilled, (state, action) => {
+        const { id, joined } = action.payload;
+        const club = state.items.find((item) => item.id === id);
+        if (!club) return;
+        if (joined) {
+          state.joinedIds.push(id);
+          club.members += 1;
+        } else {
+          state.joinedIds = state.joinedIds.filter((itemId) => itemId !== id);
+          club.members = Math.max(0, club.members - 1);
+        }
+      })
+      .addCase(createClubRemote.fulfilled, (state, action) => {
+        state.items.unshift(action.payload);
+        state.joinedIds.push(action.payload.id);
+      })
+      .addCase(deleteClubRemote.fulfilled, (state, action) => {
+        state.items = state.items.filter((c) => c.id !== action.payload);
+      });
   },
 });
 
-export const { toggleJoin, createClub, addClubPost } = clubsSlice.actions;
+export const { toggleJoin, addClubPost } = clubsSlice.actions;
 export default clubsSlice.reducer;

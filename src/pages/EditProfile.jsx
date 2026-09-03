@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { updateProfile } from "../features/auth/authSlice";
+import { backendApi } from "../services/api";
 
 function Avatar({ displayName }) {
   const initials = (displayName || "?").split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase();
@@ -19,14 +20,31 @@ function EditProfile() {
 
   const [name, setName] = useState(user?.name ?? "");
   const [bio, setBio] = useState(user?.bio ?? "");
-  const [email, setEmail] = useState(user?.email ?? "");
+  const [error, setError] = useState("");
+  const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    dispatch(updateProfile({ name: name.trim(), bio: bio.trim(), email: email.trim() }));
-    setSaved(true);
-    setTimeout(() => navigate("/profile"), 800);
+    if (!user?.id) {
+      setError("User ID not found. Please log out and log in again.");
+      return;
+    }
+    setSaving(true);
+    setError("");
+    try {
+      const updated = await backendApi.updateProfile(user.id, {
+        name: name.trim(),
+        bio: bio.trim(),
+      });
+      dispatch(updateProfile({ name: updated.name, bio: updated.bio }));
+      setSaved(true);
+      setTimeout(() => navigate("/profile"), 800);
+    } catch (err) {
+      setError(err.message || "Failed to save profile.");
+    } finally {
+      setSaving(false);
+    }
   };
 
   const inputClass = "w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-gray-100 placeholder-gray-500 focus:outline-none focus:border-[#f6b042]/50 focus:ring-1 focus:ring-[#f6b042]/20 text-sm transition-colors";
@@ -40,8 +58,6 @@ function EditProfile() {
         <h1 className="text-2xl font-semibold text-white mb-8">Edit Profile</h1>
 
         <div className="bg-white/3 border border-white/5 rounded-2xl p-6 space-y-6">
-
-          {/* Avatar preview */}
           <div className="flex items-center gap-4">
             <Avatar displayName={name || user?.email} />
             <div>
@@ -53,12 +69,23 @@ function EditProfile() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="flex flex-col gap-1">
               <label className="text-sm text-gray-400 font-medium">Display Name</label>
-              <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Your name" className={inputClass} />
+              <input
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Your name"
+                className={inputClass}
+              />
             </div>
 
             <div className="flex flex-col gap-1">
               <label className="text-sm text-gray-400 font-medium">Email</label>
-              <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" className={inputClass} />
+              <input
+                type="email"
+                value={user?.email ?? ""}
+                disabled
+                className={`${inputClass} opacity-40 cursor-not-allowed`}
+              />
+              <span className="text-xs text-gray-600">Email cannot be changed</span>
             </div>
 
             <div className="flex flex-col gap-1">
@@ -73,16 +100,25 @@ function EditProfile() {
               <span className="text-xs text-gray-600 text-right">{bio.length}/160</span>
             </div>
 
+            {error && <p className="text-red-400 text-sm">{error}</p>}
+
             <div className="flex gap-3 pt-1">
               <button
                 type="submit"
+                disabled={saving}
                 className={`flex-1 py-2.5 rounded-lg font-semibold text-sm transition-colors ${
-                  saved ? "bg-green-500/20 border border-green-500/30 text-green-400" : "bg-[#f6b042] text-black hover:bg-[#e09a2e]"
+                  saved
+                    ? "bg-green-500/20 border border-green-500/30 text-green-400"
+                    : "bg-[#f6b042] text-black hover:bg-[#e09a2e] disabled:opacity-50"
                 }`}
               >
-                {saved ? "Saved!" : "Save Changes"}
+                {saved ? "Saved!" : saving ? "Saving…" : "Save Changes"}
               </button>
-              <button type="button" onClick={() => navigate(-1)} className="px-5 py-2.5 rounded-lg border border-white/10 text-gray-400 text-sm hover:text-white transition-colors">
+              <button
+                type="button"
+                onClick={() => navigate(-1)}
+                className="px-5 py-2.5 rounded-lg border border-white/10 text-gray-400 text-sm hover:text-white transition-colors"
+              >
                 Cancel
               </button>
             </div>

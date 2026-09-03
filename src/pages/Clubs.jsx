@@ -10,7 +10,9 @@ const GENRES = ["All", "Drama", "Horror", "Sci-Fi", "World", "Art House", "Noir"
 function Clubs() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { items: clubs, joinedIds } = useSelector((s) => s.clubs);
+  const { items: clubs, joinedIds, status, error } = useSelector((s) => s.clubs);
+  const { user } = useSelector((s) => s.auth);
+  const isAdmin = user?.is_staff || user?.is_superuser || user?.role === "admin" || user?.role === "superuser";
   const [search, setSearch] = useState("");
   const [activeGenre, setActiveGenre] = useState("All");
   const [tab, setTab] = useState("all");
@@ -36,12 +38,14 @@ function Clubs() {
             <h1 className="text-2xl font-semibold text-white mb-1">Film Clubs</h1>
             <p className="text-gray-400 text-sm">Join communities built around the films you love.</p>
           </div>
-          <button
-            onClick={() => navigate("/clubs/create")}
-            className="px-4 py-2 rounded-lg bg-[#f6b042] text-black font-semibold text-sm hover:bg-[#e09a2e] transition-colors shrink-0"
-          >
-            + Create Club
-          </button>
+          {isAdmin && (
+            <button
+              onClick={() => navigate("/clubs/create")}
+              className="px-4 py-2 rounded-lg bg-[#f6b042] text-black font-semibold text-sm hover:bg-[#e09a2e] transition-colors shrink-0"
+            >
+              + Create Club
+            </button>
+          )}
         </div>
 
         {/* Search */}
@@ -90,6 +94,16 @@ function Clubs() {
           clubs={filtered}
           emptyMessage={tab === "joined" ? "You haven't joined any clubs yet." : "No clubs match your search."}
         />
+        {status === "loading" && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-2">
+            {[...Array(6)].map((_, i) => (
+              <div key={i} className="h-44 rounded-2xl bg-white/3 animate-pulse" />
+            ))}
+          </div>
+        )}
+        {status === "failed" && (
+          <p className="text-red-400 text-sm mt-4">Failed to load clubs: {error}</p>
+        )}
       </div>
     </div>
   );
