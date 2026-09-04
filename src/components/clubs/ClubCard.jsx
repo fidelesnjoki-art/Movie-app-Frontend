@@ -12,37 +12,105 @@ const GENRE_COLORS = {
 
 function ClubCard({ club }) {
   const navigate = useNavigate();
-  const genreClass = GENRE_COLORS[club.genre] ?? "bg-white/8 text-gray-300 border-white/10";
+
+  const genreClass =
+    GENRE_COLORS[club.genre] ??
+    "bg-white/10 text-gray-300 border-white/10";
+
+  const handleCardClick = () => {
+    navigate(`/clubs/${club.id}`);
+  };
 
   return (
     <div
-      onClick={() => navigate(`/clubs/${club.id}`)}
-      className="group bg-white/3 border border-white/5 rounded-2xl p-5 hover:border-white/15 hover:bg-white/5 transition-all cursor-pointer"
+      onClick={handleCardClick}
+      className="
+        group
+        bg-white/5
+        border border-white/5
+        rounded-2xl
+        p-5
+        hover:border-white/15
+        hover:bg-white/5
+        transition-all
+        cursor-pointer
+        select-none
+      "
     >
       {/* Header */}
       <div className="flex items-start justify-between gap-3 mb-3">
-        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#f6b042]/20 to-[#ff8c42]/10 flex items-center justify-center text-xl shrink-0">
-          
+        <div
+          className="
+            w-12 h-12
+            rounded-xl
+            bg-gradient-to-br
+            from-[#f6b042]/20
+            to-[#ff8c42]/10
+            flex items-center justify-center
+            text-xl
+            shrink-0
+          "
+        >
+          🎬
         </div>
-        <JoinClubButton clubId={club.id} size="sm" />
+
+        {/* Join button */}
+        <div onClick={(e) => e.stopPropagation()}>
+          <JoinClubButton
+            clubId={club.id}
+            size="sm"
+          />
+        </div>
       </div>
 
       {/* Info */}
-      <h3 className="font-semibold text-white text-base mb-1 group-hover:text-[#f6b042] transition-colors">
+      <h3
+        className="
+          font-semibold
+          text-white
+          text-base
+          mb-1
+          group-hover:text-[#f6b042]
+          transition-colors
+        "
+      >
         {club.name}
       </h3>
-      <p className="text-gray-400 text-sm leading-relaxed line-clamp-2 mb-3">
+
+      <p
+        className="
+          text-gray-400
+          text-sm
+          leading-relaxed
+          line-clamp-2
+          mb-3
+        "
+      >
         {club.description}
       </p>
 
       {/* Footer */}
       <div className="flex items-center justify-between">
+        {/* Members and posts */}
         <div className="flex items-center gap-3 text-xs text-gray-500">
-          <span>{club.members.toLocaleString()} members</span>
+          <span>{club.members?.toLocaleString()} members</span>
+
           <span className="text-gray-700">·</span>
+
           <span>{club.posts} posts</span>
         </div>
-        <span className={`px-2 py-0.5 rounded-full text-xs border ${genreClass}`}>
+
+        {/* Genre */}
+        <span
+          className={`
+            px-2
+            py-0.5
+            rounded-full
+            text-xs
+            border
+            ${genreClass}
+          `}
+        >
           {club.genre}
         </span>
       </div>
