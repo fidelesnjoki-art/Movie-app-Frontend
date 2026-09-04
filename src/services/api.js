@@ -26,26 +26,56 @@ export const tmdbApi = {
 };
 
 async function backendRequest(path, options = {}) {
-  const token = localStorage.getItem("accessToken");
-  const headers = new Headers(options.headers);
+  const makeRequest = async (opts = {}) => {
+    const token = localStorage.getItem("accessToken");
+    const headers = new Headers(opts.headers || options.headers || {});
 
-  if (options.body && !headers.has("Content-Type")) {
-    headers.set("Content-Type", "application/json");
-  }
-  if (token) headers.set("Authorization", `Bearer ${token}`);
-
-  const response = await fetch(`${BACKEND_URL}${path}`, { ...options, headers });
-  const data = await response.json().catch(() => null);
-
-  if (!response.ok) {
-    if (response.status === 401) {
-      localStorage.removeItem("accessToken");
-      localStorage.removeItem("refreshToken");
+    if ((opts.body || options.body) && !headers.has("Content-Type")) {
+      headers.set("Content-Type", "application/json");
     }
-    const message = data?.detail || Object.values(data ?? {}).flat().join(" ") || `API ${response.status}`;
-    throw new Error(message);
+    if (token) headers.set("Authorization", `Bearer ${token}`);
+
+    const response = await fetch(`${BACKEND_URL}${path}`, { ...options, ...opts, headers });
+    const data = await response.json().catch(() => null);
+    return { response, data };
+  };
+
+  // Try the request, attempt token refresh once on 401 if refresh token present
+  const { response, data } = await makeRequest();
+  if (response.ok) return data;
+
+  if (response.status === 401) {
+    const refresh = localStorage.getItem("refreshToken");
+    if (refresh) {
+      try {
+        const refreshRes = await fetch(`${BACKEND_URL}/auth/token/refresh/`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ refresh }),
+        });
+        const refreshData = await refreshRes.json().catch(() => null);
+        if (refreshRes.ok && refreshData?.access) {
+          // save new access token and retry original request once
+          localStorage.setItem("accessToken", refreshData.access);
+          const retry = await makeRequest();
+          if (retry.response.ok) return retry.data;
+        } else {
+          // refresh failed: clear tokens
+          localStorage.removeItem("accessToken");
+          localStorage.removeItem("refreshToken");
+        }
+      } catch (e) {
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
+      }
+    } else {
+      // no refresh token: clear access
+      localStorage.removeItem("accessToken");
+    }
   }
-  return data;
+
+  const message = data?.detail || Object.values(data ?? {}).flat().join(" ") || `API ${response.status}`;
+  throw new Error(message);
 }
 
 export const backendApi = {
@@ -78,6 +108,7 @@ export const backendApi = {
     method: "POST",
     body: JSON.stringify(payload),
   }),
+  listPosts: (params) => backendRequest(`/posts/` + (params ? `?${new URLSearchParams(params)}` : "")),
   togglePostLike: (id, liked) => backendRequest(`/posts/${id}/like/`, {
     method: liked ? "DELETE" : "POST",
   }),
