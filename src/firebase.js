@@ -1,4 +1,4 @@
-import { initializeApp } from "firebase/app";
+import { initializeApp, getApps } from "firebase/app";
 import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 
 const firebaseConfig = {
@@ -11,14 +11,24 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_FIREBASE_APP_ID,
 };
 
-const app = initializeApp(firebaseConfig);
-export const auth = getAuth(app);
-export const googleProvider = new GoogleAuthProvider();
-googleProvider.setCustomParameters({ prompt: "select_account" });
+const isFirebaseConfigured = Boolean(
+  firebaseConfig.apiKey &&
+    firebaseConfig.authDomain &&
+    firebaseConfig.projectId &&
+    firebaseConfig.appId
+);
+
+const app = isFirebaseConfigured && getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
+export const auth = isFirebaseConfigured ? getAuth(app) : null;
+export const googleProvider = isFirebaseConfigured ? new GoogleAuthProvider() : null;
+
+if (googleProvider) {
+  googleProvider.setCustomParameters({ prompt: "select_account" });
+}
 
 export const signInWithGoogle = async () => {
-  if (!firebaseConfig.apiKey || !firebaseConfig.authDomain || !firebaseConfig.projectId) {
-    console.warn("Firebase config is incomplete. Check VITE_FIREBASE_* values in .env");
+  if (!isFirebaseConfigured || !auth || !googleProvider) {
+    console.warn("Firebase is not configured. Google sign-in is disabled.");
     return null;
   }
 
@@ -29,7 +39,6 @@ export const signInWithGoogle = async () => {
     console.error("Google sign-in failed:", {
       code: error?.code,
       message: error?.message,
-      config: firebaseConfig,
     });
     throw error;
   }
