@@ -38,6 +38,10 @@ async function backendRequest(path, options = {}) {
   const data = await response.json().catch(() => null);
 
   if (!response.ok) {
+    if (response.status === 401) {
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
+    }
     const message = data?.detail || Object.values(data ?? {}).flat().join(" ") || `API ${response.status}`;
     throw new Error(message);
   }
