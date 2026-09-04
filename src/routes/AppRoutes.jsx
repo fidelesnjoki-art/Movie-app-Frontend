@@ -11,11 +11,14 @@ import CreatePost from "../pages/CreatePost";
 import Clubs from "../pages/Clubs";
 import ClubDetails from "../pages/ClubDetails";
 import CreateClub from "../pages/CreateClub";
+import AdminDashboard from "../pages/AdminDashboard";
 import ProtectedRoute from "./ProtectedRoute";
+import AdminRoute from "./AdminRoute";
 
 function AppRoutes() {
   return (
     <Routes>
+      {/* Public */}
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       {/* Public browsing routes */}
@@ -28,9 +31,10 @@ function AppRoutes() {
 
       {/* Protected actions / pages */}
       <Route path="/posts/create" element={<ProtectedRoute><CreatePost /></ProtectedRoute>} />
-      <Route path="/clubs/create" element={<ProtectedRoute><CreateClub /></ProtectedRoute>} />
+      <Route path="/clubs/create" element={<AdminRoute><CreateClub /></AdminRoute>} />
       <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
       <Route path="/profile/edit" element={<ProtectedRoute><EditProfile /></ProtectedRoute>} />
+      <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
     </Routes>
   );
 }

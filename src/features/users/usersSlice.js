@@ -1,31 +1,53 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { backendApi } from "../../services/api";
 
-const seedUsers = [
-  { id: 1, name: "Sofia Reyes", bio: "Cinephile. Letterboxd addict. Wong Kar-wai devotee.", watched: 743, followers: 1240, following: 310 },
-  { id: 2, name: "Marcus Webb", bio: "Film critic and occasional director. Based in London.", watched: 512, followers: 890, following: 204 },
-  { id: 3, name: "Aisha Nkosi", bio: "Documentary filmmaker. Loves Agnès Varda.", watched: 388, followers: 620, following: 180 },
-  { id: 4, name: "Lena Hoffmann", bio: "German cinema enthusiast. Herzog is my shepherd.", watched: 601, followers: 445, following: 99 },
-];
+export const fetchUsers = createAsyncThunk("users/fetchUsers", async () => {
+  const response = await backendApi.listUsers();
+  return Array.isArray(response) ? response : response.results ?? [];
+});
+
+export const toggleFollowRemote = createAsyncThunk("users/toggleFollowRemote", async (id, { getState }) => {
+  const following = getState().users.followingIds.includes(id);
+  if (following) {
+    await backendApi.unfollowUser(id);
+  } else {
+    await backendApi.followUser(id);
+  }
+  return { id, following: !following };
+});
 
 const usersSlice = createSlice({
   name: "users",
   initialState: {
-    items: seedUsers,
+    items: [],
     followingIds: [],
+    status: "idle",
   },
   reducers: {
     toggleFollow: (state, action) => {
       const id = action.payload;
-      const user = state.items.find((u) => u.id === id);
-      if (!user) return;
       if (state.followingIds.includes(id)) {
         state.followingIds = state.followingIds.filter((i) => i !== id);
-        user.followers = Math.max(0, user.followers - 1);
       } else {
         state.followingIds.push(id);
-        user.followers += 1;
       }
     },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchUsers.fulfilled, (state, action) => {
+        state.items = action.payload;
+        state.status = "succeeded";
+      })
+      .addCase(fetchUsers.pending, (state) => { state.status = "loading"; })
+      .addCase(toggleFollowRemote.fulfilled, (state, action) => {
+        const { id, following } = action.payload;
+        if (following) {
+          if (!state.followingIds.includes(id)) state.followingIds.push(id);
+        } else {
+          state.followingIds = state.followingIds.filter((i) => i !== id);
+        }
+      });
   },
 });
 

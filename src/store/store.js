@@ -5,6 +5,7 @@ import postsReducer from "../features/posts/postsSlice";
 import watchlistReducer from "../features/watchlist/watchlistSlice";
 import clubsReducer from "../features/clubs/clubsSlice";
 import usersReducer from "../features/users/usersSlice";
+import adminReducer from "../features/admin/adminSlice";
 
 export const store = configureStore({
   reducer: {
@@ -14,5 +15,6 @@ export const store = configureStore({
     watchlist: watchlistReducer,
     clubs: clubsReducer,
     users: usersReducer,
+    admin: adminReducer,
   },
 });

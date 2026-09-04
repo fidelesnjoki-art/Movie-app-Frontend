@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { toggleFollow } from "../../features/users/usersSlice";
+import { toggleFollowRemote } from "../../features/users/usersSlice";
 
 function FollowButton({ userId, size = "md" }) {
   const dispatch = useDispatch();
@@ -11,7 +11,7 @@ function FollowButton({ userId, size = "md" }) {
 
   return (
     <button
-      onClick={(e) => { e.stopPropagation(); if (!isAuthenticated) return navigate('/login'); dispatch(toggleFollow(userId)); }}
+      onClick={(e) => { e.stopPropagation(); if (!isAuthenticated) return navigate('/login'); dispatch(toggleFollowRemote(userId)); }}
       className={`${sizeClass} rounded-lg font-semibold transition-colors ${
         following
           ? "bg-white/10 border border-white/15 text-gray-300 hover:bg-red-500/10 hover:border-red-500/30 hover:text-red-400"

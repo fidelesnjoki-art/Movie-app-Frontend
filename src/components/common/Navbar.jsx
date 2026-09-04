@@ -7,6 +7,8 @@ function Navbar() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  const isAdmin = user?.is_staff || user?.is_superuser || user?.role === "admin" || user?.role === "superuser";
+
   const handleLogout = () => {
     dispatch(logout());
     navigate("/login");
@@ -29,6 +31,11 @@ function Navbar() {
           <Link to="/clubs" className="text-gray-400 hover:text-white transition-colors">
             Clubs
           </Link>
+          {isAdmin && (
+            <Link to="/admin" className="text-[#f6b042] hover:text-[#e09a2e] transition-colors font-medium">
+              Admin
+            </Link>
+          )}
           {isAuthenticated ? (
             <>
               <Link to="/profile" className="text-gray-400 hover:text-white transition-colors">

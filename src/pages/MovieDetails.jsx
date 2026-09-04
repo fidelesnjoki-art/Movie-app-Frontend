@@ -13,7 +13,7 @@ function MovieDetails() {
   const { currentMovie: movie, status } = useSelector((s) => s.movies);
   const isTV = id.startsWith("tv-");
   const tmdbId = isTV ? id.replace("tv-", "") : id;
-  const inWatchlist = useSelector((s) => s.watchlist.items.some((m) => m.id === id));
+  const inWatchlist = useSelector((s) => s.watchlist.items.some((m) => String(m.id) === String(tmdbId)));
   const isAuthenticated = useSelector((s) => s.auth.isAuthenticated);
   const relatedPosts = useSelector((s) =>
     s.posts.items.filter((p) => p.movieId === id)

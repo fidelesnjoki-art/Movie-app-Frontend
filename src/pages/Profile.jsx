@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate, Link } from "react-router-dom";
 import { toggleWatchlist } from "../features/watchlist/watchlistSlice";
+import { fetchUsers } from "../features/users/usersSlice";
 import { IMG_THUMB } from "../services/api";
 import PostCard from "../components/posts/PostCard";
 import ProfileCard from "../components/profile/ProfileCard";
@@ -35,10 +36,12 @@ function Profile() {
   const { items: clubs, joinedIds } = useSelector((s) => s.clubs);
   const { items: users, followingIds } = useSelector((s) => s.users);
 
-  const myPosts = useSelector((s) =>
-    s.posts.items.filter(
-      (p) => p.user.name === user?.name || p.user.name === user?.email
-    )
+  useEffect(() => { dispatch(fetchUsers()); }, [dispatch]);
+
+  const allPosts = useSelector((s) => s.posts.items);
+  const myPosts = useMemo(
+    () => allPosts.filter((p) => p.user.name === user?.name || p.user.name === user?.email),
+    [allPosts, user?.name, user?.email]
   );
 
   const [activeTab, setActiveTab] = useState("reviews");

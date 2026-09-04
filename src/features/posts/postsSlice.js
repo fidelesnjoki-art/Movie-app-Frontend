@@ -1,18 +1,16 @@
-// I imported createSlice to manage the posts and their actions using Redux.
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { posts as seedPosts } from "../../data/posts";
 import { backendApi } from "../../services/api";
 
 const normalizePost = (post) => ({
   id: post.id,
-  user: { name: post.user },
+  user: { name: post.user?.name || post.user || "Unknown" },
   movie: post.movie_title,
   movieId: post.movie_id,
   movie_id: post.movie_id,
   body: post.body,
   stars: post.stars,
-  likes: post.like_count,
-  comments: post.comments?.length ?? 0,
+  likes: post.like_count ?? 0,
+  comments: post.comments?.length ?? post.comment_count ?? 0,
   commentList: post.comments ?? [],
 });
 
@@ -44,11 +42,12 @@ export const addCommentRemote = createAsyncThunk("posts/addCommentRemote", async
 const postsSlice = createSlice({
   name: "posts",
   initialState: {
-    items: seedPosts,
+    items: [],
     likedIds: [],
+    status: "idle",
+    error: null,
   },
   reducers: {
-    // I added this reducer to add a new comment to a post.
     addComment: (state, action) => {
       const { postId, comment } = action.payload;
       const post = state.items.find((p) => p.id === postId);
@@ -57,8 +56,6 @@ const postsSlice = createSlice({
       post.commentList.push({ id: Date.now(), ...comment });
       post.comments = (post.comments || 0) + 1;
     },
-
-    // I added this reducer to let users like or unlike a post.
     toggleLike: (state, action) => {
       const id = action.payload;
       const post = state.items.find((p) => p.id === id);
@@ -71,16 +68,20 @@ const postsSlice = createSlice({
         post.likes += 1;
       }
     },
-
-    // I added this reducer to add a new post to the beginning of the posts list.
     addPost: (state, action) => {
       state.items.unshift({ id: Date.now(), likes: 0, comments: 0, ...action.payload });
     },
   },
   extraReducers: (builder) => {
     builder
+      .addCase(fetchPosts.pending, (state) => { state.status = "loading"; state.error = null; })
       .addCase(fetchPosts.fulfilled, (state, action) => {
+        state.status = "succeeded";
         state.items = action.payload;
+      })
+      .addCase(fetchPosts.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.error.message;
       })
       .addCase(createPost.fulfilled, (state, action) => { state.items.unshift(action.payload); })
       .addCase(toggleLikeRemote.fulfilled, (state, action) => {

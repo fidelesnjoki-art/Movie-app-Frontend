@@ -43,7 +43,8 @@ const Avatar = ({ name, size = "md" }) => {
 function LocalMovieCard({ movie }) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const inWatchlist = useSelector((s) => s.watchlist.items.some((m) => m.id === movie.id));
+  const isAuthenticated = useSelector((s) => s.auth.isAuthenticated);
+  const inWatchlist = useSelector((s) => s.watchlist.items.some((m) => String(m.id) === String(movie.id)));
   const poster = movie.img ?? (movie.poster_path ? `${IMG_THUMB}${movie.poster_path}` : null);
 
   return (
@@ -61,12 +62,13 @@ function LocalMovieCard({ movie }) {
         )}
       </div>
       <button
-        onClick={(e) => { e.stopPropagation(); dispatch(toggleWatchlist({ id: movie.id, title: movie.title, poster_path: movie.poster_path })); }}
+        onClick={(e) => { e.stopPropagation(); if (!isAuthenticated) return navigate("/login"); dispatch(toggleWatchlist({ id: movie.id, title: movie.title, poster_path: movie.poster_path })); }}
+        title={inWatchlist ? "In Watchlist" : "Add to Watchlist"}
         className={`absolute top-1.5 right-1.5 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold transition-all shadow ${
           inWatchlist ? "bg-[#f6b042] text-black" : "bg-black/70 text-white hover:bg-[#f6b042] hover:text-black"
         }`}
       >
-        {inWatchlist ? "In Watchlist" : "Add to Watchlist"}
+        {inWatchlist ? "✓" : "+"}
       </button>
       <div className="p-2">
         <div className="text-xs font-medium text-white truncate">{movie.title}</div>
@@ -106,6 +108,7 @@ function Home() {
   const { user } = useSelector((s) => s.auth);
   const { trending, status } = useSelector((s) => s.movies);
   const posts = useSelector((s) => s.posts.items);
+  const postsStatus = useSelector((s) => s.posts.status);
   const [activeTab, setActiveTab] = useState("feed");
   const [search, setSearch] = useState("");
   const [showModal, setShowModal] = useState(false);
@@ -191,8 +194,12 @@ function Home() {
                 Write Review
               </button>
             </div>
-            {sorted.length === 0 ? (
-              <p className="text-gray-500 text-sm">No reviews found.</p>
+            {sorted.length === 0 && postsStatus === "loading" ? (
+              <div className="space-y-3">
+                {[...Array(4)].map((_, i) => <div key={i} className="h-24 rounded-xl bg-white/3 animate-pulse" />)}
+              </div>
+            ) : sorted.length === 0 ? (
+              <p className="text-gray-500 text-sm">No reviews yet. Be the first to write one!</p>
             ) : (
               <div className="space-y-3">
                 {sorted.map((post) => <PostCard key={post.id} post={post} />)}

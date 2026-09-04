@@ -27,7 +27,6 @@ const authSlice = createSlice({
         if (refresh) localStorage.setItem("refreshToken", refresh);
       }
     },
-
     logout: (state) => {
       state.user = null;
       state.accessToken = null;
@@ -40,10 +39,10 @@ const authSlice = createSlice({
     },
     updateProfile: (state, action) => {
       state.user = { ...state.user, ...action.payload };
+      if (typeof localStorage !== "undefined") localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     },
   },
 });
 
 export const { login, logout, updateProfile } = authSlice.actions;
-
 export default authSlice.reducer;

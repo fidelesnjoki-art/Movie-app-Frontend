@@ -1,8 +1,8 @@
-# CineCircle
+# Cinema
 
 > Discover great films, save what you want to watch, and share the conversation.
 
-CineCircle is a responsive movie-community web app built with React. It combines movie discovery powered by TMDB with lightweight social features: profiles, reviews, comments, clubs, and a personal watchlist.
+Cinema is a responsive movie-community web app built with React. It combines movie discovery powered by TMDB with lightweight social features: profiles, reviews, comments, clubs, and a personal watchlist.
 
 ## Features
 
