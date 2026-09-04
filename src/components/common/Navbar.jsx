@@ -7,7 +7,7 @@ function Navbar() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const isAdmin = user?.is_staff || user?.is_superuser || user?.role === "admin" || user?.role === "superuser";
+  const isAdmin = Boolean(isAuthenticated && (user?.is_staff || user?.is_superuser || user?.role === "admin" || user?.role === "superuser"));
 
   const handleLogout = () => {
     dispatch(logout());
